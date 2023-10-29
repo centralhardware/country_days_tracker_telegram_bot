@@ -7,9 +7,14 @@ public class CountryIdentifier {
 
     private static final ReverseGeocoder geocoder = new ReverseGeocoder();
     public static String identify(Float latitude, Float longitude){
-        return geocoder.getCountry(latitude, longitude)
+        var country = geocoder.getCountry(latitude, longitude)
                 .map(Country::name)
                 .orElseThrow(() -> new IllegalArgumentException(""));
+        System.out.printf("Identified country %s for coordinate lat: %s lon %s%n",
+                country,
+                latitude,
+                longitude);
+        return country;
     }
 
 }

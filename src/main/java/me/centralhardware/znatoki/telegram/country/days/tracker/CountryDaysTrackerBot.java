@@ -10,6 +10,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
 import java.time.LocalDateTime;
+import java.util.stream.Collectors;
 
 @Getter
 public class CountryDaysTrackerBot extends TelegramLongPollingBot {
@@ -25,6 +26,22 @@ public class CountryDaysTrackerBot extends TelegramLongPollingBot {
 
         var text = update.getMessage().getText();
 
+        if (text.equalsIgnoreCase("/stat")){
+            var stat = CountryDaysTrackerMapper.getStat()
+                    .stream()
+                    .map(it -> it.getCountry() + " - " + it.getCountOfDays())
+                    .collect(Collectors.joining("\n"));
+            try {
+                execute(SendMessage.builder()
+                        .chatId(update.getMessage().getChatId())
+                        .text(stat)
+                        .build());
+            } catch (TelegramApiException e) {
+                throw new RuntimeException(e);
+            }
+            return;
+        }
+
         Float latitude = Float.valueOf(text.split(" ")[0]);
         Float longitude = Float.valueOf(text.split(" ")[1]);
         var country = CountryIdentifier.identify(latitude, longitude);
@@ -37,13 +54,12 @@ public class CountryDaysTrackerBot extends TelegramLongPollingBot {
                 .longitude(longitude)
                 .country(country)
                 .build());
-
-        var message = SendMessage.builder()
-                .chatId(update.getMessage().getChatId())
-                .text(country)
-                .build();
+        ;
         try {
-            execute(message);
+            execute(SendMessage.builder()
+                    .chatId(update.getMessage().getChatId())
+                    .text(country)
+                    .build());
         } catch (TelegramApiException e) {
             throw new RuntimeException(e);
         }
