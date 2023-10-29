@@ -10,10 +10,4 @@ WORKDIR /znatokiBot
 
 COPY --from=maven target/countryDaysTrackerTelegramBot-1.0-SNAPSHOT.jar .
 
-RUN apt-get update -y && \
-    apt-get upgrade -y && \
-    apt-get install tzdata curl fontconfig libfreetype6 -y
-
-ENV TZ Asia/Novosibirsk
-
 CMD ["java", "-jar", "countryDaysTrackerTelegramBot-1.0-SNAPSHOT.jar" ]
