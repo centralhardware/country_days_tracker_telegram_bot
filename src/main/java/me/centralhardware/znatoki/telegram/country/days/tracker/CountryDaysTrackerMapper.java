@@ -32,6 +32,7 @@ public interface CountryDaysTrackerMapper {
             FROM (
                 SELECT DISTINCT country, toStartOfDay(date_time)
                 FROM country_days_tracker
+                WHERE user_id = #{user_id}
                  )
             GROUP BY country
             ORDER BY count(*) DESC
@@ -40,15 +41,15 @@ public interface CountryDaysTrackerMapper {
             @Result(property = "country", column = "country"),
             @Result(property = "countOfDays", column = "count_of_days")
     })
-    List<Stat> __getStat();
+    List<Stat> __getStat(@Param("user_id") Long userId);
 
     CountryDaysTrackerMapper mapper = ClickhouseConfiguration.getSqlSessionClickhouse().openSession().getMapper(CountryDaysTrackerMapper.class);
     static void insert(Track track){
         mapper.__insert(track);
     }
 
-    static List<Stat> getStat(){
-        return mapper.__getStat();
+    static List<Stat> getStat(Long userId){
+        return mapper.__getStat(userId);
     }
 
 

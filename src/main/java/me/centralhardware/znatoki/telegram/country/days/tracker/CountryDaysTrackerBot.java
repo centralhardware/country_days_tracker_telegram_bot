@@ -25,15 +25,16 @@ public class CountryDaysTrackerBot extends TelegramLongPollingBot {
         if (!update.hasMessage() || StringUtils.isBlank(update.getMessage().getText())) return;
 
         var text = update.getMessage().getText();
+        var userId = update.getMessage().getFrom().getId();
 
         if (text.equalsIgnoreCase("/stat")){
-            var stat = CountryDaysTrackerMapper.getStat()
+            var stat = CountryDaysTrackerMapper.getStat(userId)
                     .stream()
                     .map(it -> it.getCountry() + " - " + it.getCountOfDays())
                     .collect(Collectors.joining("\n"));
             try {
                 execute(SendMessage.builder()
-                        .chatId(update.getMessage().getChatId())
+                        .chatId(userId)
                         .text(stat)
                         .build());
             } catch (TelegramApiException e) {
@@ -49,7 +50,7 @@ public class CountryDaysTrackerBot extends TelegramLongPollingBot {
         CountryDaysTrackerMapper.insert(Track
                 .builder()
                 .dateTime(LocalDateTime.now())
-                .userId(update.getMessage().getFrom().getId())
+                .userId(userId)
                 .latitude(latitude)
                 .longitude(longitude)
                 .country(country)
@@ -57,7 +58,7 @@ public class CountryDaysTrackerBot extends TelegramLongPollingBot {
         ;
         try {
             execute(SendMessage.builder()
-                    .chatId(update.getMessage().getChatId())
+                    .chatId(userId)
                     .text(country)
                     .build());
         } catch (TelegramApiException e) {
