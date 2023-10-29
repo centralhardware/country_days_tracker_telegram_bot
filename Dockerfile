@@ -8,7 +8,7 @@ FROM openjdk:21-slim
 
 WORKDIR /znatokiBot
 
-COPY --from=maven target/znatokiStatistic-1.0-SNAPSHOT.jar .
+COPY --from=maven target/countryDaysTrackerTelegramBot-1.0-SNAPSHOT.jar .
 
 RUN apt-get update -y && \
     apt-get upgrade -y && \
@@ -16,4 +16,4 @@ RUN apt-get update -y && \
 
 ENV TZ Asia/Novosibirsk
 
-CMD ["java", "-jar", "znatokiStatistic-1.0-SNAPSHOT.jar" ]
+CMD ["java", "-jar", "countryDaysTrackerTelegramBot-1.0-SNAPSHOT.jar" ]
