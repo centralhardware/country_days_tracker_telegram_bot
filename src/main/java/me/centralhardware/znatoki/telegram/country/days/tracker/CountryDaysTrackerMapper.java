@@ -28,7 +28,7 @@ public interface CountryDaysTrackerMapper {
     void __insert(@Param("track") Track track);
 
     @Select("""
-            SELECT country, count(*)
+            SELECT country, count(*) as count_of_days
             FROM (
                 SELECT DISTINCT country, toStartOfDay(date_time)
                 FROM country_days_tracker
