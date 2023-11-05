@@ -18,7 +18,14 @@ public class Geocode {
 
     public static String geocode(Float latitude, Float longitude) throws IOException, InterruptedException, ApiException {
         var res = GeocodingApi.reverseGeocode(context, new LatLng(latitude, longitude)).await();
-        return res[0].formattedAddress;
+        var address = res[0].formattedAddress;
+
+        System.out.printf("Geocoded address  %s for coordinate lat: %s lon %s%n",
+                address,
+                latitude,
+                longitude);
+
+        return address;
     }
 
 }
