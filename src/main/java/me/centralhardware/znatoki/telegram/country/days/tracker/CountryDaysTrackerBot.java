@@ -59,7 +59,7 @@ public class CountryDaysTrackerBot extends TelegramLongPollingBot {
             ;
             execute(SendMessage.builder()
                     .chatId(userId)
-                    .text(country)
+                    .text(address)
                     .build());
         } catch (TelegramApiException | IOException | InterruptedException | ApiException e) {
             throw new RuntimeException(e);
