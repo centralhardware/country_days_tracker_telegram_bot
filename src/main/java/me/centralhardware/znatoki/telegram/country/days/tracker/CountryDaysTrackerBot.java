@@ -1,5 +1,6 @@
 package me.centralhardware.znatoki.telegram.country.days.tracker;
 
+import com.google.maps.errors.ApiException;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -9,6 +10,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.stream.Collectors;
 
@@ -22,46 +24,44 @@ public class CountryDaysTrackerBot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-        if (!update.hasMessage() || StringUtils.isBlank(update.getMessage().getText())) return;
+        try {
+            if (!update.hasMessage() || StringUtils.isBlank(update.getMessage().getText())) return;
 
-        var text = update.getMessage().getText();
-        var userId = update.getMessage().getFrom().getId();
+            var text = update.getMessage().getText();
+            var userId = update.getMessage().getFrom().getId();
 
-        if (text.equalsIgnoreCase("/stat")){
-            var stat = CountryDaysTrackerMapper.getStat(userId)
-                    .stream()
-                    .map(it -> it.getCountry() + " - " + it.getCountOfDays())
-                    .collect(Collectors.joining("\n"));
-            try {
+            if (text.equalsIgnoreCase("/stat")){
+                var stat = CountryDaysTrackerMapper.getStat(userId)
+                        .stream()
+                        .map(it -> it.getCountry() + " - " + it.getCountOfDays())
+                        .collect(Collectors.joining("\n"));
                 execute(SendMessage.builder()
                         .chatId(userId)
                         .text(stat)
                         .build());
-            } catch (TelegramApiException e) {
-                throw new RuntimeException(e);
+                return;
             }
-            return;
-        }
 
-        Float latitude = Float.valueOf(text.split(" ")[0]);
-        Float longitude = Float.valueOf(text.split(" ")[1]);
-        var country = CountryIdentifier.identify(latitude, longitude);
+            Float latitude = Float.valueOf(text.split(" ")[0]);
+            Float longitude = Float.valueOf(text.split(" ")[1]);
+            var country = CountryIdentifier.identify(latitude, longitude);
+            var address = Geocode.geocode(latitude, longitude);
 
-        CountryDaysTrackerMapper.insert(Track
-                .builder()
-                .dateTime(LocalDateTime.now())
-                .userId(userId)
-                .latitude(latitude)
-                .longitude(longitude)
-                .country(country)
-                .build());
-        ;
-        try {
+            CountryDaysTrackerMapper.insert(Track
+                    .builder()
+                    .dateTime(LocalDateTime.now())
+                    .userId(userId)
+                    .latitude(latitude)
+                    .longitude(longitude)
+                    .country(country)
+                    .address(address)
+                    .build());
+            ;
             execute(SendMessage.builder()
                     .chatId(userId)
                     .text(country)
                     .build());
-        } catch (TelegramApiException e) {
+        } catch (TelegramApiException | IOException | InterruptedException | ApiException e) {
             throw new RuntimeException(e);
         }
     }

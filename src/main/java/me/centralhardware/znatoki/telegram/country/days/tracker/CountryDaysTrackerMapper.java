@@ -15,14 +15,16 @@ public interface CountryDaysTrackerMapper {
                 user_id,
                 latitude,
                 longitude,
-                country
+                country,
+                address
             )
             VALUES (
                 #{track.dateTime},
                 #{track.userId},
                 #{track.latitude},
                 #{track.longitude},
-                #{track.country}
+                #{track.country},
+                #{track.address}
             )
             """)
     void __insert(@Param("track") Track track);
