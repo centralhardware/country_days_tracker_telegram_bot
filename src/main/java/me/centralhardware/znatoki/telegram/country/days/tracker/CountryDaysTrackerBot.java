@@ -58,6 +58,8 @@ public class CountryDaysTrackerBot extends TelegramLongPollingBot {
             var country = CountryIdentifier.identify(latitude, longitude);
             var address = Geocode.geocode(latitude, longitude);
 
+            System.out.printf("lat: %s, lon: %s, lat: %s", latitude, longitude, altitude);
+
             CountryDaysTrackerMapper.insert(Track
                     .builder()
                     .dateTime(LocalDateTime.now())

@@ -20,7 +20,7 @@ public class Geocode {
         var res = GeocodingApi.reverseGeocode(context, new LatLng(latitude, longitude)).await();
         var address = res[0].formattedAddress;
 
-        System.out.printf("Geocoded address  %s for coordinate lat: %s lon %s%n",
+        System.out.printf("Geocoded address %s",
                 address,
                 latitude,
                 longitude);
