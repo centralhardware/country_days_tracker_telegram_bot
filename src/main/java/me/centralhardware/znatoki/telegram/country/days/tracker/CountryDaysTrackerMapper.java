@@ -1,6 +1,5 @@
 package me.centralhardware.znatoki.telegram.country.days.tracker;
 
-import org.apache.commons.lang3.ObjectUtils;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
@@ -15,6 +14,7 @@ public interface CountryDaysTrackerMapper {
                 user_id,
                 latitude,
                 longitude,
+                altitude,
                 country,
                 address
             )
@@ -23,6 +23,7 @@ public interface CountryDaysTrackerMapper {
                 #{track.userId},
                 #{track.latitude},
                 #{track.longitude},
+                #{track.altitude},
                 #{track.country},
                 #{track.address}
             )
@@ -40,10 +41,24 @@ public interface CountryDaysTrackerMapper {
             ORDER BY count(*) DESC
             """)
     @Results({
-            @Result(property = "country", column = "country"),
-            @Result(property = "countOfDays", column = "count_of_days")
+            @Result(property = "stat", column = "country"),
+            @Result(property = "value", column = "count_of_days")
     })
     List<Stat> __getStat(@Param("user_id") Long userId);
+
+    @Select("""
+            SELECT address, count(*) as count
+            FROM country_days_tracker
+            WHERE user_id = #{user_id} AND not empty(address)
+            GROUP BY address
+            ORDER BY count(*) DESC
+            """)
+    @Results({
+            @Result(property = "stat", column = "address"),
+            @Result(property = "value", column = "count")
+    })
+    List<Stat> __getStatAddresses(@Param("user_id") Long userId);
+
 
     CountryDaysTrackerMapper mapper = ClickhouseConfiguration.getSqlSessionClickhouse().openSession().getMapper(CountryDaysTrackerMapper.class);
     static void insert(Track track){
@@ -54,5 +69,8 @@ public interface CountryDaysTrackerMapper {
         return mapper.__getStat(userId);
     }
 
+    static List<Stat> getStatAddresses(Long userId){
+        return mapper.__getStatAddresses(userId);
+    }
 
 }

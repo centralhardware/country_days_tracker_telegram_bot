@@ -7,7 +7,7 @@ import lombok.Setter;
 @Setter
 public class Stat {
 
-    private String country;
-    private Integer countOfDays;
+    private String stat;
+    private Integer value;
 
 }

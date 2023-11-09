@@ -33,7 +33,17 @@ public class CountryDaysTrackerBot extends TelegramLongPollingBot {
             if (text.equalsIgnoreCase("/stat")){
                 var stat = CountryDaysTrackerMapper.getStat(userId)
                         .stream()
-                        .map(it -> it.getCountry() + " - " + it.getCountOfDays())
+                        .map(it -> it.getStat() + " - " + it.getValue())
+                        .collect(Collectors.joining("\n"));
+                execute(SendMessage.builder()
+                        .chatId(userId)
+                        .text(stat)
+                        .build());
+                return;
+            } else if (text.equalsIgnoreCase("/statAddresses")){
+                var stat = CountryDaysTrackerMapper.getStatAddresses(userId)
+                        .stream()
+                        .map(it -> it.getStat() + " - " + it.getValue())
                         .collect(Collectors.joining("\n"));
                 execute(SendMessage.builder()
                         .chatId(userId)
@@ -44,6 +54,7 @@ public class CountryDaysTrackerBot extends TelegramLongPollingBot {
 
             Float latitude = Float.valueOf(text.split(" ")[0]);
             Float longitude = Float.valueOf(text.split(" ")[1]);
+            Float altitude = Float.valueOf(text.split(" ")[2].replace(",", "."));
             var country = CountryIdentifier.identify(latitude, longitude);
             var address = Geocode.geocode(latitude, longitude);
 
@@ -53,6 +64,7 @@ public class CountryDaysTrackerBot extends TelegramLongPollingBot {
                     .userId(userId)
                     .latitude(latitude)
                     .longitude(longitude)
+                    .altitude(altitude)
                     .country(country)
                     .address(address)
                     .build());
