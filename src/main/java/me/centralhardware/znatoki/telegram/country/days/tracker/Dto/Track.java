@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
 
 @Builder
 @Getter
@@ -16,7 +15,7 @@ public class Track {
     private Long userId;
     private Float latitude;
     private Float longitude;
-    private Float altitude;
+    private Integer altitude;
     private String country;
     private String address;
 

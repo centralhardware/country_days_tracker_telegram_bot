@@ -12,6 +12,8 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -55,13 +57,14 @@ public class CountryDaysTrackerBot extends TelegramLongPollingBot {
                 return;
             }
 
-            Float latitude = Float.valueOf(text.split(" ")[0]);
-            Float longitude = Float.valueOf(text.split(" ")[1]);
-            Float altitude = Float.valueOf(text.split(" ")[2].replace(",", "."));
+            Float latitude = round(Float.valueOf(text.split(" ")[0]), 5);
+            Float longitude = round(Float.valueOf(text.split(" ")[1]), 5);
+            Integer altitude = Integer.valueOf(text.split(" ")[2].replace(",", ".").split("\\.")[0]);
+
+            System.out.printf("lat: %s, lon: %s, alt: %s \n", latitude, longitude, altitude);
+
             var country = CountryIdentifier.identify(latitude, longitude);
             var address = Geocode.geocode(latitude, longitude);
-
-            System.out.printf("lat: %s, lon: %s, lat: %s \n", latitude, longitude, altitude);
 
             CountryDaysTrackerMapper.insert(Track
                     .builder()
@@ -80,6 +83,10 @@ public class CountryDaysTrackerBot extends TelegramLongPollingBot {
         } catch (TelegramApiException | IOException | InterruptedException | ApiException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private Float round(Float f, Integer scale){
+        return BigDecimal.valueOf(f).setScale(scale, RoundingMode.HALF_UP).floatValue();
     }
 
     private final String botUsername = System.getenv("BOT_USERNAME");
