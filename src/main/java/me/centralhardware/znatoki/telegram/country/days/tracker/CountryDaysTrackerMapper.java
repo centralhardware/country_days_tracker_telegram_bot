@@ -1,5 +1,7 @@
 package me.centralhardware.znatoki.telegram.country.days.tracker;
 
+import me.centralhardware.znatoki.telegram.country.days.tracker.Dto.Stat;
+import me.centralhardware.znatoki.telegram.country.days.tracker.Dto.Track;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
@@ -33,10 +35,10 @@ public interface CountryDaysTrackerMapper {
     @Select("""
             SELECT country, count(*) as count_of_days
             FROM (
-                SELECT DISTINCT country, toStartOfDay(date_time)
-                FROM country_days_tracker
-                WHERE user_id = #{user_id}
-                 )
+                     SELECT DISTINCT country,toStartOfDay(date_time)
+                     FROM country_days_tracker
+                     WHERE user_id = 428985392
+                     )
             GROUP BY country
             ORDER BY count(*) DESC
             """)
@@ -48,8 +50,11 @@ public interface CountryDaysTrackerMapper {
 
     @Select("""
             SELECT address, count(*) as count
-            FROM country_days_tracker
-            WHERE user_id = #{user_id} AND not empty(address)
+            FROM (
+                     SELECT DISTINCT address, toStartOfDay(date_time)
+                     FROM country_days_tracker
+                     WHERE user_id = #{user_id} AND NOT empty(address)
+                     )
             GROUP BY address
             ORDER BY count(*) DESC
             """)

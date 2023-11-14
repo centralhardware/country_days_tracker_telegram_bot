@@ -1,10 +1,11 @@
-package me.centralhardware.znatoki.telegram.country.days.tracker;
+package me.centralhardware.znatoki.telegram.country.days.tracker.Dto;
 
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 @Builder
 @Getter

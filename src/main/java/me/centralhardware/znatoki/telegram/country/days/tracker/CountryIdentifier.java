@@ -10,10 +10,7 @@ public class CountryIdentifier {
         var country = geocoder.getCountry(latitude, longitude)
                 .map(Country::name)
                 .orElseThrow(() -> new IllegalArgumentException(""));
-        System.out.printf("Identified country %s",
-                country,
-                latitude,
-                longitude);
+        System.out.printf("Identified country %s \n", country);
         return country;
     }
 

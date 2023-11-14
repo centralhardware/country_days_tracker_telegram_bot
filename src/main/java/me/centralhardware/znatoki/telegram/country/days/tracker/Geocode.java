@@ -3,12 +3,9 @@ package me.centralhardware.znatoki.telegram.country.days.tracker;
 import com.google.maps.GeoApiContext;
 import com.google.maps.GeocodingApi;
 import com.google.maps.errors.ApiException;
-import com.google.maps.model.AddressType;
 import com.google.maps.model.LatLng;
-import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.IOException;
-import java.util.Arrays;
 
 public class Geocode {
 
@@ -20,10 +17,7 @@ public class Geocode {
         var res = GeocodingApi.reverseGeocode(context, new LatLng(latitude, longitude)).await();
         var address = res[0].formattedAddress;
 
-        System.out.printf("Geocoded address %s",
-                address,
-                latitude,
-                longitude);
+        System.out.printf("Geocoded address %s \n", address);
 
         return address;
     }

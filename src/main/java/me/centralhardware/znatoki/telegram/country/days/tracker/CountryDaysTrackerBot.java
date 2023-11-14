@@ -2,6 +2,7 @@ package me.centralhardware.znatoki.telegram.country.days.tracker;
 
 import com.google.maps.errors.ApiException;
 import lombok.Getter;
+import me.centralhardware.znatoki.telegram.country.days.tracker.Dto.Track;
 import org.apache.commons.lang3.StringUtils;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
@@ -12,6 +13,7 @@ import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Getter
@@ -30,10 +32,11 @@ public class CountryDaysTrackerBot extends TelegramLongPollingBot {
             var text = update.getMessage().getText();
             var userId = update.getMessage().getFrom().getId();
 
+            var i = new AtomicInteger(1);
             if (text.equalsIgnoreCase("/stat")){
                 var stat = CountryDaysTrackerMapper.getStat(userId)
                         .stream()
-                        .map(it -> it.getStat() + " - " + it.getValue())
+                        .map(it -> i.getAndIncrement() + "- " + it.getStat() + " - " + it.getValue())
                         .collect(Collectors.joining("\n"));
                 execute(SendMessage.builder()
                         .chatId(userId)
@@ -43,7 +46,7 @@ public class CountryDaysTrackerBot extends TelegramLongPollingBot {
             } else if (text.equalsIgnoreCase("/statAddresses")){
                 var stat = CountryDaysTrackerMapper.getStatAddresses(userId)
                         .stream()
-                        .map(it -> it.getStat() + " - " + it.getValue())
+                        .map(it -> i.getAndIncrement() + "- " + it.getStat() + " - " + it.getValue())
                         .collect(Collectors.joining("\n"));
                 execute(SendMessage.builder()
                         .chatId(userId)
@@ -58,11 +61,11 @@ public class CountryDaysTrackerBot extends TelegramLongPollingBot {
             var country = CountryIdentifier.identify(latitude, longitude);
             var address = Geocode.geocode(latitude, longitude);
 
-            System.out.printf("lat: %s, lon: %s, lat: %s", latitude, longitude, altitude);
+            System.out.printf("lat: %s, lon: %s, lat: %s \n", latitude, longitude, altitude);
 
             CountryDaysTrackerMapper.insert(Track
                     .builder()
-                    .dateTime(LocalDateTime.now())
+                    .dateTime(LocalDateTime.now().atZone(TimezoneIdentifier.identify(latitude, longitude)).toLocalDateTime())
                     .userId(userId)
                     .latitude(latitude)
                     .longitude(longitude)
@@ -70,7 +73,6 @@ public class CountryDaysTrackerBot extends TelegramLongPollingBot {
                     .country(country)
                     .address(address)
                     .build());
-            ;
             execute(SendMessage.builder()
                     .chatId(userId)
                     .text(address)

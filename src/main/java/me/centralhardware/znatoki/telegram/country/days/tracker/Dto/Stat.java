@@ -1,4 +1,4 @@
-package me.centralhardware.znatoki.telegram.country.days.tracker;
+package me.centralhardware.znatoki.telegram.country.days.tracker.Dto;
 
 import lombok.Getter;
 import lombok.Setter;
