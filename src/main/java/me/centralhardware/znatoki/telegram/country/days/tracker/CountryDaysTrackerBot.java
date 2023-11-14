@@ -68,7 +68,7 @@ public class CountryDaysTrackerBot extends TelegramLongPollingBot {
 
             CountryDaysTrackerMapper.insert(Track
                     .builder()
-                    .dateTime(LocalDateTime.now().atZone(TimezoneIdentifier.identify(latitude, longitude)).toLocalDateTime())
+                    .dateTime(LocalDateTime.now().atZone(TimezoneIdentifier.identify(latitude, longitude)).withZoneSameInstant(TimezoneIdentifier.identify(latitude, longitude)).toLocalDateTime())
                     .userId(userId)
                     .latitude(latitude)
                     .longitude(longitude)
