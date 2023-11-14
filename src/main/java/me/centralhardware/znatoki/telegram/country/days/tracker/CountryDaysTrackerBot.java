@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -68,7 +69,7 @@ public class CountryDaysTrackerBot extends TelegramLongPollingBot {
 
             CountryDaysTrackerMapper.insert(Track
                     .builder()
-                    .dateTime(LocalDateTime.now().atZone(TimezoneIdentifier.identify(latitude, longitude)).withZoneSameInstant(TimezoneIdentifier.identify(latitude, longitude)).toLocalDateTime())
+                    .dateTime(ZonedDateTime.now().withZoneSameInstant(TimezoneIdentifier.identify(latitude, longitude)).toLocalDateTime())
                     .userId(userId)
                     .latitude(latitude)
                     .longitude(longitude)
