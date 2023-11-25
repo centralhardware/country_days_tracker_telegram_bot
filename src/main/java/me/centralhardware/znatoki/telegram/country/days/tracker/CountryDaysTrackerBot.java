@@ -4,6 +4,7 @@ import com.google.maps.errors.ApiException;
 import lombok.Getter;
 import me.centralhardware.znatoki.telegram.country.days.tracker.Dto.Track;
 import org.apache.commons.lang3.StringUtils;
+import org.ocpsoft.prettytime.PrettyTime;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -16,6 +17,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
+import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -39,7 +41,7 @@ public class CountryDaysTrackerBot extends TelegramLongPollingBot {
             if (text.equalsIgnoreCase("/stat")){
                 var stat = CountryDaysTrackerMapper.getStat(userId)
                         .stream()
-                        .map(it -> i.getAndIncrement() + "- " + it.getStat() + " - " + it.getValue())
+                        .map(it -> i.getAndIncrement() + "- " + it.getStat() + " - " + it.getValue() + prettyDays(it.getValue()))
                         .collect(Collectors.joining("\n"));
                 execute(SendMessage.builder()
                         .chatId(userId)
@@ -88,6 +90,14 @@ public class CountryDaysTrackerBot extends TelegramLongPollingBot {
 
     private Float round(Float f, Integer scale){
         return BigDecimal.valueOf(f).setScale(scale, RoundingMode.HALF_UP).floatValue();
+    }
+
+    private String prettyDays(Integer countOfDays){
+        if (countOfDays < 7) return "";
+
+        PrettyTime prettyTime = new PrettyTime();
+        prettyTime.setLocale(Locale.US);
+        return " (" + prettyTime.formatDuration(LocalDateTime.now().plusDays(countOfDays)) + ")";
     }
 
     private final String botUsername = System.getenv("BOT_USERNAME");
