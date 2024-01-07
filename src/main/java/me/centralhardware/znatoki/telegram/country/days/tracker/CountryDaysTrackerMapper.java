@@ -17,8 +17,7 @@ public interface CountryDaysTrackerMapper {
                 latitude,
                 longitude,
                 altitude,
-                country,
-                address
+                country
             )
             VALUES (
                 #{track.dateTime},
@@ -26,8 +25,7 @@ public interface CountryDaysTrackerMapper {
                 #{track.latitude},
                 #{track.longitude},
                 #{track.altitude},
-                #{track.country},
-                #{track.address}
+                #{track.country}
             )
             """)
     void __insert(@Param("track") Track track);

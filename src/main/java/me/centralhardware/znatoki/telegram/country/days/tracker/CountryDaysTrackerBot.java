@@ -67,7 +67,6 @@ public class CountryDaysTrackerBot extends TelegramLongPollingBot {
             System.out.printf("lat: %s, lon: %s, alt: %s \n", latitude, longitude, altitude);
 
             var country = CountryIdentifier.identify(latitude, longitude);
-            var address = Geocode.geocode(latitude, longitude);
 
             CountryDaysTrackerMapper.insert(Track
                     .builder()
@@ -77,11 +76,10 @@ public class CountryDaysTrackerBot extends TelegramLongPollingBot {
                     .longitude(longitude)
                     .altitude(altitude)
                     .country(country)
-                    .address(address)
                     .build());
             execute(SendMessage.builder()
                     .chatId(userId)
-                    .text(address)
+                    .text("OK")
                     .build());
         } catch (TelegramApiException | IOException | InterruptedException | ApiException e) {
             throw new RuntimeException(e);

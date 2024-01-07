@@ -17,6 +17,5 @@ public class Track {
     private Float longitude;
     private Integer altitude;
     private String country;
-    private String address;
 
 }
