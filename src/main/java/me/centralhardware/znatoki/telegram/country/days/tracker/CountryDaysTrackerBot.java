@@ -48,16 +48,6 @@ public class CountryDaysTrackerBot extends TelegramLongPollingBot {
                         .text(stat)
                         .build());
                 return;
-            } else if (text.equalsIgnoreCase("/statAddresses")){
-                var stat = CountryDaysTrackerMapper.getStatAddresses(userId)
-                        .stream()
-                        .map(it -> i.getAndIncrement() + "- " + it.getStat() + " - " + it.getValue())
-                        .collect(Collectors.joining("\n"));
-                execute(SendMessage.builder()
-                        .chatId(userId)
-                        .text(stat)
-                        .build());
-                return;
             }
 
             Float latitude = round(Float.valueOf(text.split(" ")[0]), 5);
