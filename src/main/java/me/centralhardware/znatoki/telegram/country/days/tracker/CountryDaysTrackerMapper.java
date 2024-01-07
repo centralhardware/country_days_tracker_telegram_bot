@@ -46,23 +46,6 @@ public interface CountryDaysTrackerMapper {
     })
     List<Stat> __getStat(@Param("user_id") Long userId);
 
-    @Select("""
-            SELECT address, count(*) as count
-            FROM (
-                     SELECT DISTINCT address, toStartOfDay(date_time)
-                     FROM country_days_tracker
-                     WHERE user_id = #{user_id} AND NOT empty(address)
-                     )
-            GROUP BY address
-            ORDER BY count(*) DESC
-            """)
-    @Results({
-            @Result(property = "stat", column = "address"),
-            @Result(property = "value", column = "count")
-    })
-    List<Stat> __getStatAddresses(@Param("user_id") Long userId);
-
-
     CountryDaysTrackerMapper mapper = ClickhouseConfiguration.getSqlSessionClickhouse().openSession().getMapper(CountryDaysTrackerMapper.class);
     static void insert(Track track){
         mapper.__insert(track);
@@ -70,10 +53,6 @@ public interface CountryDaysTrackerMapper {
 
     static List<Stat> getStat(Long userId){
         return mapper.__getStat(userId);
-    }
-
-    static List<Stat> getStatAddresses(Long userId){
-        return mapper.__getStatAddresses(userId);
     }
 
 }
