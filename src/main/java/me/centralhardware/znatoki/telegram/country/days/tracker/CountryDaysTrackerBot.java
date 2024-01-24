@@ -1,6 +1,5 @@
 package me.centralhardware.znatoki.telegram.country.days.tracker;
 
-import com.google.maps.errors.ApiException;
 import lombok.Getter;
 import me.centralhardware.znatoki.telegram.country.days.tracker.Dto.Track;
 import org.apache.commons.lang3.StringUtils;
@@ -12,7 +11,6 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
@@ -71,7 +69,7 @@ public class CountryDaysTrackerBot extends TelegramLongPollingBot {
                     .chatId(userId)
                     .text(country)
                     .build());
-        } catch (TelegramApiException | IOException | InterruptedException | ApiException e) {
+        } catch (TelegramApiException e) {
             throw new RuntimeException(e);
         }
     }
