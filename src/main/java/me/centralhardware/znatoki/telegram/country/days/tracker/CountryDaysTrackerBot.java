@@ -14,6 +14,7 @@ import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -51,14 +52,13 @@ public class CountryDaysTrackerBot extends TelegramLongPollingBot {
             Float latitude = round(Float.valueOf(text.split(" ")[0]), 5);
             Float longitude = round(Float.valueOf(text.split(" ")[1]), 5);
             Integer altitude = Integer.valueOf(text.split(" ")[2].replace(",", ".").split("\\.")[0]);
+            ZoneId ts = TimezoneIdentifier.identify(text.split(" ")[3]);
+            String country = CountryIdentifier.identify(text.split("")[4]);
 
             System.out.printf("lat: %s, lon: %s, alt: %s \n", latitude, longitude, altitude);
-
-            var country = CountryIdentifier.identify(latitude, longitude);
-
             CountryDaysTrackerMapper.insert(Track
                     .builder()
-                    .dateTime(ZonedDateTime.now().withZoneSameInstant(TimezoneIdentifier.identify(latitude, longitude)).toLocalDateTime())
+                    .dateTime(ZonedDateTime.now().withZoneSameInstant(ts).toLocalDateTime())
                     .userId(userId)
                     .latitude(latitude)
                     .longitude(longitude)

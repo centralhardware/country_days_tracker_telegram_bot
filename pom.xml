@@ -58,12 +58,6 @@
         </dependency>
 
         <dependency>
-            <groupId>uk.recurse</groupId>
-            <artifactId>reverse-country-code</artifactId>
-            <version>1.0.0</version>
-        </dependency>
-
-        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
             <version>2.0.5</version>
@@ -72,12 +66,6 @@
             <groupId>org.ocpsoft.prettytime</groupId>
             <artifactId>prettytime</artifactId>
             <version>5.0.7.Final</version>
-        </dependency>
-
-        <dependency>
-            <groupId>net.iakovlev</groupId>
-            <artifactId>timeshape</artifactId>
-            <version>2023b.20</version>
         </dependency>
     </dependencies>
 
