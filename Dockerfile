@@ -8,6 +8,7 @@ FROM openjdk:21-slim
 
 WORKDIR /znatokiBot
 
-COPY --from=maven target/countryDaysTrackerTelegramBot-1.0-SNAPSHOT.jar .
+COPY --from=maven build/libs/countryDaysTrackerBotKotlin-1.0-SNAPSHOT-standalone.jar .
 
-CMD ["java", "-jar", "countryDaysTrackerTelegramBot-1.0-SNAPSHOT.jar" ]
+CMD ["java", "-jar", "countryDaysTrackerBotKotlin-1.0-SNAPSHOT-standalone.jar" ]
+
