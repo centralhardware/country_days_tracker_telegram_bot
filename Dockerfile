@@ -3,8 +3,7 @@ FROM gradle:jdk21-alpine as gradle
 COPY ./ ./
 
 RUN gradle fatJar
-RUN cd build/libs/
-RUN pwd
+RUN cd build/libs & pwd
 
 FROM openjdk:21-slim
 
