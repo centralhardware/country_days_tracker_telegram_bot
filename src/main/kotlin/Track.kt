@@ -1,5 +1,3 @@
-package me.centralhardware.znatoki.telegram.country.days.tracker.Dto
-
 import java.time.LocalDateTime
 
 data class Track(

@@ -1,6 +1,3 @@
-package me.centralhardware.znatoki.telegram.country.days.tracker
-
-import me.centralhardware.znatoki.telegram.country.days.tracker.Dto.Track
 import org.apache.ibatis.annotations.*
 
 @Mapper

@@ -1,5 +1,3 @@
-package me.centralhardware
-
 import dev.inmo.tgbotapi.extensions.api.send.reply
 import dev.inmo.tgbotapi.extensions.behaviour_builder.telegramBotWithBehaviourAndLongPolling
 import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onCommand
@@ -7,8 +5,6 @@ import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onText
 import dev.inmo.tgbotapi.extensions.utils.extensions.raw.text
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import me.centralhardware.znatoki.telegram.country.days.tracker.CountryDaysTrackerMapper
-import me.centralhardware.znatoki.telegram.country.days.tracker.Dto.Track
 import org.ocpsoft.prettytime.PrettyTime
 import java.math.BigDecimal
 import java.math.RoundingMode

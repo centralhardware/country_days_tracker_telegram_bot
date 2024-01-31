@@ -1,5 +1,3 @@
-package me.centralhardware.znatoki.telegram.country.days.tracker
-
 import com.clickhouse.jdbc.ClickHouseDataSource
 import org.apache.ibatis.mapping.Environment
 import org.apache.ibatis.session.SqlSessionFactory
