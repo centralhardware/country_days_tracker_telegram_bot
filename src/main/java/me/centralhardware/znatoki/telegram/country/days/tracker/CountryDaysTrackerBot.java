@@ -53,9 +53,9 @@ public class CountryDaysTrackerBot extends TelegramLongPollingBot {
             Float longitude = round(Float.valueOf(text.split(" ")[1]), 5);
             Integer altitude = Integer.valueOf(text.split(" ")[2].replace(",", ".").split("\\.")[0]);
             ZoneId ts = TimezoneIdentifier.identify(text.split(" ")[3]);
-            String country = CountryIdentifier.identify(text.split("")[4]);
+            String country = CountryIdentifier.identify(text.split(" ")[4]);
 
-            System.out.printf("lat: %s, lon: %s, alt: %s \n", latitude, longitude, altitude);
+            System.out.printf("lat: %s, lon: %s, alt: %s, ts: %s, cc: %s", latitude, longitude, altitude, ts.getId(), country);
             CountryDaysTrackerMapper.insert(Track
                     .builder()
                     .dateTime(ZonedDateTime.now().withZoneSameInstant(ts).toLocalDateTime())
