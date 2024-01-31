@@ -59,13 +59,11 @@ suspend fun main() {
 
         onCommand("/stat") {
             val i = AtomicInteger(1)
-            if (it.text.equals("/stat", ignoreCase = true)) {
-                val stat = CountryDaysTrackerMapper.getStat(it.chat.id.chatId)
-                    .stream()
-                    .map { "${i.getAndIncrement()} - ${it.first} - ${it.second} ${prettyDays(it.second)}" }
-                    .collect(Collectors.joining("\n"))
-                reply(it, stat)
-            }
+            val stat = CountryDaysTrackerMapper.getStat(it.chat.id.chatId)
+                .stream()
+                .map { "${i.getAndIncrement()} - ${it.first} - ${it.second} ${prettyDays(it.second)}" }
+                .collect(Collectors.joining("\n"))
+            reply(it, stat)
         }
     }.second.join()
 }
