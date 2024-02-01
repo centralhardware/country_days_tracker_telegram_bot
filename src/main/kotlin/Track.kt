@@ -6,5 +6,6 @@ data class Track(
     val latitude: Float,
     val longitude: Float,
     val country: String,
-    val tzname: String
+    val tzname: String,
+    val locality: String
 )
