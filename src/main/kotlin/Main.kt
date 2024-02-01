@@ -35,6 +35,18 @@ suspend fun main() {
     telegramBotWithBehaviourAndLongPolling(System.getenv("BOT_TOKEN"), CoroutineScope(Dispatchers.IO)) {
         onText {
             val text = it.text;
+
+            if (text == "/stat"){
+                val i = AtomicInteger(1)
+                val stat = CountryDaysTrackerMapper.getStat(it.chat.id.chatId)
+                    .stream()
+                    .map { "${i.getAndIncrement()} - ${it.first} - ${it.second} ${prettyDays(it.second)}" }
+                    .collect(Collectors.joining("\n"))
+                reply(it, stat)
+
+                return@onText
+            }
+
             val arguments = text!!.split(" ")
 
             val latitude = arguments[0].toFloat().round(5)
@@ -55,15 +67,6 @@ suspend fun main() {
                 )
             )
             reply(it, country)
-        }
-
-        onCommand("/stat") {
-            val i = AtomicInteger(1)
-            val stat = CountryDaysTrackerMapper.getStat(it.chat.id.chatId)
-                .stream()
-                .map { "${i.getAndIncrement()} - ${it.first} - ${it.second} ${prettyDays(it.second)}" }
-                .collect(Collectors.joining("\n"))
-            reply(it, stat)
         }
     }.second.join()
 }
