@@ -10,7 +10,6 @@ interface CountryDaysTrackerMapper {
                 user_id,
                 latitude,
                 longitude,
-                altitude,
                 country
             )
             VALUES (
@@ -18,7 +17,6 @@ interface CountryDaysTrackerMapper {
                 #{track.userId},
                 #{track.latitude},
                 #{track.longitude},
-                #{track.altitude},
                 #{track.country}
             )
             """)
