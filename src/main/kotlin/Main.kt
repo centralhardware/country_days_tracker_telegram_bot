@@ -42,6 +42,7 @@ suspend fun main() {
                     .stream()
                     .map { "${i.getAndIncrement()} - ${it.first} - ${it.second} ${prettyDays(it.second)}" }
                     .collect(Collectors.joining("\n"))
+                println(stat + "\n")
                 reply(it, stat)
 
                 return@onText
