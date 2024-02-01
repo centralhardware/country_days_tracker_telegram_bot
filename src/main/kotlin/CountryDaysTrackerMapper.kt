@@ -35,8 +35,8 @@ interface CountryDaysTrackerMapper {
             ORDER BY count(*) DESC
             """)
     @Results(
-        Result(property = "stat", column = "country"),
-        Result(property = "value", column = "count_of_days")
+        Result(property = "first", column = "country"),
+        Result(property = "second", column = "count_of_days")
     )
     fun __getStat(@Param("user_id") userId: Long): List<Pair<String, Int>>
 
