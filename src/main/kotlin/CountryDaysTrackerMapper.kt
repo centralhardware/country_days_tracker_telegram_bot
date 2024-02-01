@@ -10,14 +10,16 @@ interface CountryDaysTrackerMapper {
                 user_id,
                 latitude,
                 longitude,
-                country
+                country,
+                tzname
             )
             VALUES (
                 #{track.dateTime},
                 #{track.userId},
                 #{track.latitude},
                 #{track.longitude},
-                #{track.country}
+                #{track.country},
+                #{track.tzname}
             )
             """)
     fun __insert(@Param("track") track: Track)

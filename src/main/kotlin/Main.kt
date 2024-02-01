@@ -58,7 +58,8 @@ suspend fun main() {
                     it.chat.id.chatId,
                     latitude,
                     longitude,
-                    country
+                    country,
+                    arguments[2]
                 )
             )
             reply(it, country)
