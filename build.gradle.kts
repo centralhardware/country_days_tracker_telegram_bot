@@ -15,9 +15,9 @@ dependencies {
     implementation("org.apache.httpcomponents.client5:httpclient5:5.3.1")
     implementation("org.lz4:lz4-java:1.8.0")
     implementation("org.mybatis:mybatis:3.5.15")
-//    implementation("org.slf4j:slf4j-simple:2.0.11")
+    implementation("org.slf4j:slf4j-simple:2.0.11")
     implementation("org.ocpsoft.prettytime:prettytime:5.0.7.Final")
-
+    implementation("com.github.seratch:kotliquery:1.9.0")
     testImplementation("org.jetbrains.kotlin:kotlin-test")
 }
 
