@@ -113,7 +113,7 @@ suspend fun main() {
                         "longitude" to longitude,
                         "country" to country,
                         "tzname" to arguments[2],
-                        "locality" to arguments[2]
+                        "locality" to arguments[4]
                     )
                 )
             )
