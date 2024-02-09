@@ -4,7 +4,7 @@ COPY ./ ./
 
 RUN gradle fatJar
 
-FROM openjdk:21-slim
+FROM findepi/graalvm:java21
 
 WORKDIR /znatokiBot
 
