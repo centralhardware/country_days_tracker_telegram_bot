@@ -1,4 +1,4 @@
-FROM gradle:jdk21-jdk21-graal as gradle
+FROM gradle:jdk21-graal as gradle
 
 COPY ./ ./
 
