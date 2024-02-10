@@ -1,8 +1,11 @@
 import com.clickhouse.jdbc.ClickHouseDataSource
+import dev.inmo.tgbotapi.extensions.api.bot.setMyCommands
 import dev.inmo.tgbotapi.extensions.api.send.reply
 import dev.inmo.tgbotapi.extensions.behaviour_builder.telegramBotWithBehaviourAndLongPolling
+import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onCommand
 import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onText
 import dev.inmo.tgbotapi.extensions.utils.extensions.raw.text
+import dev.inmo.tgbotapi.types.BotCommand
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotliquery.Row
@@ -40,22 +43,22 @@ fun toCountry(cc: String) = Locale.of("", cc).displayCountry
 
 
 suspend fun main() {
-    telegramBotWithBehaviourAndLongPolling(System.getenv("BOT_TOKEN"), CoroutineScope(Dispatchers.IO)) {
-        onText {
-            val text = it.text;
+    telegramBotWithBehaviourAndLongPolling(System.getenv("BOT_TOKEN"),
+        CoroutineScope(Dispatchers.IO),
+        defaultExceptionsHandler = {t -> println(t)}) {
+        setMyCommands(
+            BotCommand("stat", "вывести статистику")
+        )
+        onCommand("stat"){
+            val i = AtomicInteger(1)
 
-            val session = sessionOf(dataSource)
+            val toMember: (Row) -> Pair<String, Int> = { row ->
+                Pair(row.string("country"), row.int("count_of_days"))
+            }
 
-            if (text == "/stat") {
-                val i = AtomicInteger(1)
-
-                val toMember: (Row) -> Pair<String, Int> = { row ->
-                    Pair(row.string("country"), row.int("count_of_days"))
-                }
-
-                val stat = session.run(
-                    queryOf(
-                        """
+            val stat = sessionOf(dataSource).run(
+                queryOf(
+                    """
                                   SELECT country, count(*) as count_of_days
                                   FROM (
                                     SELECT DISTINCT country,toStartOfDay(date_time)
@@ -65,16 +68,16 @@ suspend fun main() {
                                   GROUP BY country
                                   ORDER BY count(*) DESC
                 """,
-                        mapOf("user_id" to it.chat.id.chatId)
-                    ).map(toMember).asList
-                ).map { "${i.getAndIncrement()} - ${it.first} - ${it.second} (${prettyDays(it.second)})" }
-                    .joinToString("\n")
+                    mapOf("user_id" to it.chat.id.chatId)
+                ).map(toMember).asList
+            ).map { "${i.getAndIncrement()} - ${it.first} - ${it.second} (${prettyDays(it.second)})" }
+                .joinToString("\n")
 
-                println(stat + "\n")
-                reply(it, stat)
-
-                return@onText
-            }
+            println(stat + "\n")
+            reply(it, stat)
+        }
+        onText() {
+            val text = it.text;
 
             val arguments = text!!.split(" ")
 
@@ -85,7 +88,7 @@ suspend fun main() {
 
             println("lat: ${latitude}, lon: ${longitude}, ts: ${ts}, cc: ${country}\n")
 
-            session.execute(
+            sessionOf(dataSource).execute(
                 queryOf(
                     """
                               INSERT INTO country_days_tracker
