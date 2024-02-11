@@ -8,7 +8,6 @@ import dev.inmo.tgbotapi.extensions.utils.extensions.raw.text
 import dev.inmo.tgbotapi.types.BotCommand
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotliquery.Row
 import kotliquery.queryOf
 import kotliquery.sessionOf
 import org.ocpsoft.prettytime.PrettyTime
@@ -39,22 +38,18 @@ fun prettyDays(countOfDays: Int): String {
 
 fun toTimeZone(ts: String): ZoneId = TimeZone.getTimeZone(ts).toZoneId()
 
-fun toCountry(cc: String) = Locale.of("", cc).displayCountry
+fun toCountry(cc: String): String = Locale.of("", cc).displayCountry
 
 
 suspend fun main() {
     telegramBotWithBehaviourAndLongPolling(System.getenv("BOT_TOKEN"),
         CoroutineScope(Dispatchers.IO),
-        defaultExceptionsHandler = {t -> println(t)}) {
+        defaultExceptionsHandler = { t -> println(t) }) {
         setMyCommands(
             BotCommand("stat", "вывести статистику")
         )
-        onCommand("stat"){
+        onCommand("stat") {
             val i = AtomicInteger(1)
-
-            val toMember: (Row) -> Pair<String, Int> = { row ->
-                Pair(row.string("country"), row.int("count_of_days"))
-            }
 
             val stat = sessionOf(dataSource).run(
                 queryOf(
@@ -69,15 +64,16 @@ suspend fun main() {
                                   ORDER BY count(*) DESC
                 """,
                     mapOf("user_id" to it.chat.id.chatId)
-                ).map(toMember).asList
-            ).map { "${i.getAndIncrement()} - ${it.first} - ${it.second} (${prettyDays(it.second)})" }
-                .joinToString("\n")
+                ).map { row ->
+                    Pair(row.string("country"), row.int("count_of_days"))
+                }.asList
+            ).joinToString("\n") { "${i.getAndIncrement()} - ${it.first} - ${it.second} (${prettyDays(it.second)})" }
 
             println(stat + "\n")
             reply(it, stat)
         }
-        onText() {
-            val text = it.text;
+        onText {
+            val text = it.text
 
             val arguments = text!!.split(" ")
 
