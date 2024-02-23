@@ -11,6 +11,7 @@ import kotlinx.coroutines.Dispatchers
 import kotliquery.queryOf
 import kotliquery.sessionOf
 import org.ocpsoft.prettytime.PrettyTime
+import org.slf4j.LoggerFactory
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.sql.SQLException
@@ -20,6 +21,8 @@ import java.time.ZonedDateTime
 import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
 import javax.sql.DataSource
+
+val log = LoggerFactory.getLogger("root")
 
 val dataSource: DataSource = try {
     ClickHouseDataSource(System.getenv("CLICKHOUSE_URL"))
@@ -44,7 +47,7 @@ fun toCountry(cc: String): String = Locale.of("", cc).displayCountry
 suspend fun main() {
     telegramBotWithBehaviourAndLongPolling(System.getenv("BOT_TOKEN"),
         CoroutineScope(Dispatchers.IO),
-        defaultExceptionsHandler = { t -> println(t) }) {
+        defaultExceptionsHandler = { t -> log.warn("", t) }) {
         setMyCommands(
             BotCommand("stat", "вывести статистику")
         )
@@ -69,7 +72,7 @@ suspend fun main() {
                 }.asList
             ).joinToString("\n") { "${i.getAndIncrement()} - ${it.first} - ${it.second} (${prettyDays(it.second)})" }
 
-            println(stat + "\n")
+            log.info(stat)
             reply(it, stat)
         }
         onText {
@@ -82,7 +85,7 @@ suspend fun main() {
             val ts = toTimeZone(arguments[2])
             val country = toCountry(arguments[3])
 
-            println("lat: ${latitude}, lon: ${longitude}, ts: ${ts}, cc: ${country}\n")
+            log.info("lat: $latitude, lon: $longitude, ts: $ts, cc: $country")
 
             sessionOf(dataSource).execute(
                 queryOf(

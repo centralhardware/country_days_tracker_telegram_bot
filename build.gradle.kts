@@ -18,6 +18,9 @@ dependencies {
     implementation("org.slf4j:slf4j-simple:2.0.11")
     implementation("org.ocpsoft.prettytime:prettytime:5.0.7.Final")
     implementation("com.github.seratch:kotliquery:1.9.0")
+    implementation("org.slf4j:slf4j-api:2.0.12")
+    implementation("ch.qos.logback:logback-classic:1.5.0")
+    implementation("ch.qos.logback:logback-core:1.5.0")
     testImplementation("org.jetbrains.kotlin:kotlin-test")
 }
 
