@@ -4,12 +4,16 @@ import dev.inmo.tgbotapi.extensions.api.send.reply
 import dev.inmo.tgbotapi.extensions.behaviour_builder.telegramBotWithBehaviourAndLongPolling
 import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onCommand
 import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onText
+import dev.inmo.tgbotapi.extensions.utils.asCommonUser
+import dev.inmo.tgbotapi.extensions.utils.extensions.raw.from
 import dev.inmo.tgbotapi.extensions.utils.extensions.raw.text
 import dev.inmo.tgbotapi.types.BotCommand
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotliquery.queryOf
 import kotliquery.sessionOf
+import me.centralhardware.telegram.bot.common.ClickhouseKt
 import org.ocpsoft.prettytime.PrettyTime
 import org.slf4j.LoggerFactory
 import java.math.BigDecimal
@@ -45,6 +49,7 @@ fun toCountry(cc: String): String = Locale.of("", cc).displayCountry
 
 
 suspend fun main() {
+    val clickhouse = ClickhouseKt()
     telegramBotWithBehaviourAndLongPolling(System.getenv("BOT_TOKEN"),
         CoroutineScope(Dispatchers.IO),
         defaultExceptionsHandler = { t -> log.warn("", t) }) {
@@ -52,6 +57,8 @@ suspend fun main() {
             BotCommand("stat", "вывести статистику")
         )
         onCommand("stat") {
+            async { clickhouse.log(it.text!!, false, it.from!!.asCommonUser(), "countryDaysTrackerBot") }
+
             val i = AtomicInteger(1)
 
             val stat = sessionOf(dataSource).run(
@@ -77,6 +84,7 @@ suspend fun main() {
         }
         onText {
             val text = it.text
+            async { clickhouse.log(it.text!!, false, it.from!!.asCommonUser(), "countryDaysTrackerBot") }
 
             val arguments = text!!.split(" ")
 

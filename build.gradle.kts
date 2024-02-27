@@ -7,9 +7,11 @@ version = "1.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
+    maven { setUrl("https://jitpack.io") }
 }
 
 dependencies {
+    implementation("com.github.centralhardware:telegram-bot-commons:ce9b9efb48")
     implementation("dev.inmo:tgbotapi:10.0.0")
     implementation("com.clickhouse:clickhouse-jdbc:0.6.0")
     implementation("org.apache.httpcomponents.client5:httpclient5:5.3.1")
