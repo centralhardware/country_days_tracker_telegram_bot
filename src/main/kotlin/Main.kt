@@ -104,7 +104,7 @@ suspend fun main() {
                                 latitude,
                                 longitude,
                                 country,
-                                tzname,
+                                tzname
                               )
                               VALUES (
                                 :date_time,
