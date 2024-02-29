@@ -105,7 +105,6 @@ suspend fun main() {
                                 longitude,
                                 country,
                                 tzname,
-                                locality
                               )
                               VALUES (
                                 :date_time,
@@ -113,8 +112,7 @@ suspend fun main() {
                                 :latitude,
                                 :longitude,
                                 :country,
-                                :tzname,
-                                :locality)
+                                :tzname)
             """,
                     mapOf(
                         "date_time" to ZonedDateTime.now().withZoneSameInstant(ts).toLocalDateTime(),
@@ -122,8 +120,7 @@ suspend fun main() {
                         "latitude" to latitude,
                         "longitude" to longitude,
                         "country" to country,
-                        "tzname" to arguments[2],
-                        "locality" to arguments[4]
+                        "tzname" to arguments[2]
                     )
                 )
             )
