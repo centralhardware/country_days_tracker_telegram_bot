@@ -45,7 +45,7 @@ fun prettyDays(countOfDays: Int): String {
 
 fun toTimeZone(ts: String): ZoneId = TimeZone.getTimeZone(ts).toZoneId()
 
-fun toCountry(cc: String): String = Locale.of("", cc).displayCountry
+fun toCountry(cc: String): String = Locale.of("en", cc).displayCountry
 
 
 suspend fun main() {
