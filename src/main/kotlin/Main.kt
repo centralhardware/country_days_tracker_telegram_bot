@@ -14,6 +14,7 @@ import kotlinx.coroutines.async
 import kotliquery.queryOf
 import kotliquery.sessionOf
 import me.centralhardware.telegram.bot.common.ClickhouseKt
+import me.centralhardware.telegram.bot.common.MessageType
 import org.ocpsoft.prettytime.PrettyTime
 import org.slf4j.LoggerFactory
 import java.math.BigDecimal
@@ -57,7 +58,7 @@ suspend fun main() {
             BotCommand("stat", "вывести статистику")
         )
         onCommand("stat") {
-            async { clickhouse.log(it.text!!, false, it.from!!.asCommonUser(), "countryDaysTrackerBot") }
+            async { clickhouse.log(it.text!!, it.from!!.asCommonUser(), "countryDaysTrackerBot", MessageType.TEXT) }
 
             val i = AtomicInteger(1)
 
@@ -84,7 +85,7 @@ suspend fun main() {
         }
         onText {
             val text = it.text
-            async { clickhouse.log(it.text!!, false, it.from!!.asCommonUser(), "countryDaysTrackerBot") }
+            async { clickhouse.log(it.text!!, it.from!!.asCommonUser(), "countryDaysTrackerBot", MessageType.TEXT) }
 
             val arguments = text!!.split(" ")
 
