@@ -11,8 +11,8 @@ repositories {
 }
 
 dependencies {
-    implementation("com.github.centralhardware:telegram-bot-commons:29d6ca32dc")
-    implementation("dev.inmo:tgbotapi:10.0.0")
+    implementation("com.github.centralhardware:telegram-bot-commons:edffad4991")
+    implementation("dev.inmo:tgbotapi:11.0.0")
     implementation("com.clickhouse:clickhouse-jdbc:0.6.0")
     implementation("org.apache.httpcomponents.client5:httpclient5:5.3.1")
     implementation("org.lz4:lz4-java:1.8.0")
