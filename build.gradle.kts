@@ -12,17 +12,16 @@ repositories {
 
 dependencies {
     implementation("com.github.centralhardware:telegram-bot-commons:edffad4991")
-    implementation("dev.inmo:tgbotapi:11.0.0")
-    implementation("com.clickhouse:clickhouse-jdbc:0.6.0")
+    implementation("dev.inmo:tgbotapi:12.0.1")
+    implementation("com.clickhouse:clickhouse-jdbc:0.6.0-patch3")
     implementation("org.apache.httpcomponents.client5:httpclient5:5.3.1")
     implementation("org.lz4:lz4-java:1.8.0")
-    implementation("org.mybatis:mybatis:3.5.15")
-    implementation("org.slf4j:slf4j-simple:2.0.11")
-    implementation("org.ocpsoft.prettytime:prettytime:5.0.7.Final")
+    implementation("org.slf4j:slf4j-simple:2.0.13")
+    implementation("org.ocpsoft.prettytime:prettytime:5.0.8.Final")
     implementation("com.github.seratch:kotliquery:1.9.0")
-    implementation("org.slf4j:slf4j-api:2.0.12")
-    implementation("ch.qos.logback:logback-classic:1.5.0")
-    implementation("ch.qos.logback:logback-core:1.5.0")
+    implementation("org.slf4j:slf4j-api:2.0.13")
+    implementation("ch.qos.logback:logback-classic:1.5.6")
+    implementation("ch.qos.logback:logback-core:1.5.6")
     testImplementation("org.jetbrains.kotlin:kotlin-test")
 }
 
