@@ -11,6 +11,7 @@ repositories {
 
 dependencies {
     implementation("dev.inmo:tgbotapi:17.0.0")
+    implementation("org.apache.httpcomponents.client5:httpclient5:5.3.1")
     implementation("com.clickhouse:clickhouse-jdbc:0.6.4")
     implementation("org.lz4:lz4-java:1.8.0")
     implementation("org.slf4j:slf4j-simple:2.0.16")
