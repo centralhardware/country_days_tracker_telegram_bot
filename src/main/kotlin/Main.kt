@@ -1,4 +1,5 @@
 import com.clickhouse.jdbc.ClickHouseDataSource
+import com.sun.net.httpserver.HttpServer
 import dev.inmo.tgbotapi.extensions.api.bot.setMyCommands
 import dev.inmo.tgbotapi.extensions.api.send.reply
 import dev.inmo.tgbotapi.extensions.behaviour_builder.telegramBotWithBehaviourAndLongPolling
@@ -14,6 +15,7 @@ import org.ocpsoft.prettytime.PrettyTime
 import org.slf4j.LoggerFactory
 import java.math.BigDecimal
 import java.math.RoundingMode
+import java.net.InetSocketAddress
 import java.sql.SQLException
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -45,6 +47,7 @@ fun toCountry(cc: String): String = Locale.of("en", cc).displayCountry
 
 
 suspend fun main() {
+    HttpServer.create().apply { bind(InetSocketAddress(80), 0); createContext("/health") { it.sendResponseHeaders(200, 0); it.responseBody.close() }; start() }
     telegramBotWithBehaviourAndLongPolling(System.getenv("BOT_TOKEN"),
         CoroutineScope(Dispatchers.IO),
         defaultExceptionsHandler = { t -> log.warn("", t) }) {

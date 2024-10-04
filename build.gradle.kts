@@ -9,17 +9,20 @@ repositories {
     mavenCentral()
 }
 
+val slf4jVersion = "2.0.16"
+val logbackVersion = "1.5.8"
+
 dependencies {
     implementation("dev.inmo:tgbotapi:18.2.1")
-    implementation("org.apache.httpcomponents.client5:httpclient5:5.3.1")
-    implementation("com.clickhouse:clickhouse-jdbc:0.6.4")
+//    implementation("org.apache.httpcomponents.client5:httpclient5:5.3.1")
+    implementation("com.clickhouse:clickhouse-jdbc:0.7.0")
     implementation("org.lz4:lz4-java:1.8.0")
-    implementation("org.slf4j:slf4j-simple:2.0.16")
+    implementation("org.slf4j:slf4j-simple:$slf4jVersion")
+    implementation("org.slf4j:slf4j-api:$slf4jVersion")
     implementation("org.ocpsoft.prettytime:prettytime:5.0.9.Final")
     implementation("com.github.seratch:kotliquery:1.9.0")
-    implementation("org.slf4j:slf4j-api:2.0.16")
-    implementation("ch.qos.logback:logback-classic:1.5.6")
-    implementation("ch.qos.logback:logback-core:1.5.7")
+    implementation("ch.qos.logback:logback-classic:$logbackVersion")
+    implementation("ch.qos.logback:logback-core:$logbackVersion")
 }
 
 tasks.test {
