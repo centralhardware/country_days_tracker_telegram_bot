@@ -12,9 +12,10 @@ repositories {
 val slf4jVersion = "2.0.16"
 val logbackVersion = "1.5.8"
 
+val ktorVersion = "2.3.12";
+
 dependencies {
     implementation("dev.inmo:tgbotapi:18.2.1")
-//    implementation("org.apache.httpcomponents.client5:httpclient5:5.3.1")
     implementation("com.clickhouse:clickhouse-jdbc:0.6.5")
     implementation("org.lz4:lz4-java:1.8.0")
     implementation("org.slf4j:slf4j-simple:$slf4jVersion")
@@ -23,6 +24,9 @@ dependencies {
     implementation("com.github.seratch:kotliquery:1.9.0")
     implementation("ch.qos.logback:logback-classic:$logbackVersion")
     implementation("ch.qos.logback:logback-core:$logbackVersion")
+
+    implementation("io.ktor:ktor-server-netty:$ktorVersion")
+    implementation("io.ktor:ktor-server-core:$ktorVersion")
 }
 
 tasks.test {
