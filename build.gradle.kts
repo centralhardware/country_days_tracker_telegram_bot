@@ -16,6 +16,7 @@ val ktorVersion = "2.3.12";
 
 dependencies {
     implementation("dev.inmo:tgbotapi:18.2.1")
+    implementation("org.apache.httpcomponents.client5:httpclient5:5.3.1")
     implementation("com.clickhouse:clickhouse-jdbc:0.6.5")
     implementation("org.lz4:lz4-java:1.8.0")
     implementation("org.slf4j:slf4j-simple:$slf4jVersion")
