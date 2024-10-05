@@ -73,7 +73,7 @@ suspend fun main() {
                 }
             }
         }
-    }
+    }.start(wait = false)
     telegramBotWithBehaviourAndLongPolling(
         System.getenv("BOT_TOKEN"),
         CoroutineScope(Dispatchers.IO),
