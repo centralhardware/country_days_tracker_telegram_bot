@@ -12,6 +12,7 @@ import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import io.ktor.server.response.respond
 import io.ktor.server.routing.get
+import io.ktor.server.routing.post
 import io.ktor.server.routing.routing
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -58,7 +59,7 @@ suspend fun main() {
                 call.respond(HttpStatusCode.OK)
             }
 
-            get("/location") {
+            post("/location") {
                 val latitude = call.request.queryParameters["latitude"]?.toFloatOrNull()
                 val longitude = call.request.queryParameters["longitude"]?.toFloat()
                 val timezone = call.request.queryParameters["timezone"]
