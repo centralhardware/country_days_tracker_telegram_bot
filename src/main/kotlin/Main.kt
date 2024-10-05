@@ -150,7 +150,7 @@ fun save(latitude: Float, longitude: Float, ts: ZoneId, country: String, userId:
                 "user_id" to userId,
                 "latitude" to latitude,
                 "longitude" to longitude,
-                "country" to country,
+                "country" to toCountry(country),
                 "tzname" to ts
             )
         )
