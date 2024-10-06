@@ -1,4 +1,9 @@
 import com.clickhouse.jdbc.ClickHouseDataSource
+import dev.inmo.kslog.common.KSLog
+import dev.inmo.kslog.common.LogLevel
+import dev.inmo.kslog.common.info
+import dev.inmo.kslog.common.setDefaultKSLog
+import dev.inmo.kslog.common.warning
 import dev.inmo.tgbotapi.extensions.api.bot.setMyCommands
 import dev.inmo.tgbotapi.extensions.api.send.reply
 import dev.inmo.tgbotapi.extensions.behaviour_builder.telegramBotWithBehaviourAndLongPolling
@@ -19,7 +24,6 @@ import kotlinx.coroutines.Dispatchers
 import kotliquery.queryOf
 import kotliquery.sessionOf
 import org.ocpsoft.prettytime.PrettyTime
-import org.slf4j.LoggerFactory
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.sql.SQLException
@@ -29,8 +33,6 @@ import java.time.ZonedDateTime
 import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
 import javax.sql.DataSource
-
-val log = LoggerFactory.getLogger("root")
 
 val dataSource: DataSource = try {
     ClickHouseDataSource(System.getenv("CLICKHOUSE_URL"))
@@ -53,6 +55,7 @@ fun toCountry(cc: String): String = Locale.of("en", cc).displayCountry
 
 
 suspend fun main() {
+    setDefaultKSLog(KSLog("countryDaysTrackerBo", minLoggingLevel = LogLevel.INFO))
     embeddedServer(Netty, port = 80) {
         routing {
             get("/health") {
@@ -78,7 +81,7 @@ suspend fun main() {
     telegramBotWithBehaviourAndLongPolling(
         System.getenv("BOT_TOKEN"),
         CoroutineScope(Dispatchers.IO),
-        defaultExceptionsHandler = { t -> log.warn("", t) }) {
+        defaultExceptionsHandler = { t -> KSLog.warning("", t) }) {
         setMyCommands(
             BotCommand("stat", "вывести статистику")
         )
@@ -103,7 +106,7 @@ suspend fun main() {
                 }.asList
             ).joinToString("\n") { "${i.getAndIncrement()} - ${it.first} - ${it.second} (${prettyDays(it.second)})" }
 
-            log.info(stat)
+            KSLog.info(stat)
             reply(it, stat)
         }
         onText {
@@ -124,7 +127,7 @@ suspend fun main() {
 }
 
 fun save(latitude: Float, longitude: Float, ts: ZoneId, country: String, userId: Long) {
-    log.info("lat: $latitude, lon: $longitude, ts: $ts, cc: $country")
+    KSLog.info("lat: $latitude, lon: $longitude, ts: $ts, cc: $country")
 
     sessionOf(dataSource).execute(
         queryOf(
