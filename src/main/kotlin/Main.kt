@@ -1,9 +1,9 @@
 import com.clickhouse.jdbc.ClickHouseDataSource
 import dev.inmo.kslog.common.KSLog
-import dev.inmo.kslog.common.LogLevel
+import dev.inmo.kslog.common.configure
 import dev.inmo.kslog.common.info
-import dev.inmo.kslog.common.setDefaultKSLog
 import dev.inmo.kslog.common.warning
+import dev.inmo.tgbotapi.bot.ktor.HealthCheckKtorPipelineStepsHolder
 import dev.inmo.tgbotapi.extensions.api.bot.setMyCommands
 import dev.inmo.tgbotapi.extensions.api.send.reply
 import dev.inmo.tgbotapi.extensions.behaviour_builder.telegramBotWithBehaviourAndLongPolling
@@ -11,14 +11,12 @@ import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onComman
 import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onText
 import dev.inmo.tgbotapi.extensions.utils.extensions.raw.text
 import dev.inmo.tgbotapi.types.BotCommand
-import io.ktor.http.HttpStatusCode
-import io.ktor.server.application.call
-import io.ktor.server.engine.embeddedServer
-import io.ktor.server.netty.Netty
-import io.ktor.server.response.respond
-import io.ktor.server.routing.get
-import io.ktor.server.routing.post
-import io.ktor.server.routing.routing
+import io.ktor.http.*
+import io.ktor.server.application.*
+import io.ktor.server.engine.*
+import io.ktor.server.netty.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotliquery.queryOf
@@ -54,12 +52,17 @@ fun toTimeZone(ts: String): ZoneId = TimeZone.getTimeZone(ts).toZoneId()
 fun toCountry(cc: String): String = Locale.of("en", cc).displayCountry
 
 
+val healthChecker: HealthCheckKtorPipelineStepsHolder = HealthCheckKtorPipelineStepsHolder()
 suspend fun main() {
-    setDefaultKSLog(KSLog("countryDaysTrackerBo", minLoggingLevel = LogLevel.INFO))
+    KSLog.configure("CountryDaysTrackerBot")
     embeddedServer(Netty, port = 80) {
         routing {
             get("/health") {
-                call.respond(HttpStatusCode.OK)
+                if (healthChecker.health.value) {
+                    call.respond(HttpStatusCode.OK)
+                } else {
+                    call.respond(HttpStatusCode.BadRequest)
+                }
             }
 
             post("/location") {
@@ -81,7 +84,8 @@ suspend fun main() {
     telegramBotWithBehaviourAndLongPolling(
         System.getenv("BOT_TOKEN"),
         CoroutineScope(Dispatchers.IO),
-        defaultExceptionsHandler = { t -> KSLog.warning("", t) }) {
+        defaultExceptionsHandler = { t -> KSLog.warning("", t) },
+        builder = { pipelineStepsHolder = healthChecker }) {
         setMyCommands(
             BotCommand("stat", "вывести статистику")
         )
