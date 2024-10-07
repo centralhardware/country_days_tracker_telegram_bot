@@ -115,6 +115,7 @@ suspend fun main() {
         }
         onText {
             val text = it.text
+            if (text == "/stat") return@onText
             val arguments = text!!.split(" ")
             val country = toCountry(arguments[3])
 
