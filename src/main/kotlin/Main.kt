@@ -57,14 +57,6 @@ suspend fun main() {
     KSLog.configure("CountryDaysTrackerBot")
     embeddedServer(Netty, port = 80) {
         routing {
-            get("/health") {
-                if (healthChecker.health.value) {
-                    call.respond(HttpStatusCode.OK)
-                } else {
-                    call.respond(HttpStatusCode.BadRequest)
-                }
-            }
-
             post("/location") {
                 val latitude = call.request.queryParameters["latitude"]?.toFloatOrNull()
                 val longitude = call.request.queryParameters["longitude"]?.toFloat()
