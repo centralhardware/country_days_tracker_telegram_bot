@@ -1,10 +1,10 @@
-FROM gradle:jdk21-graal as gradle
+FROM gradle:jdk22-graal as gradle
 
 COPY ./ ./
 
 RUN gradle fatJar
 
-FROM findepi/graalvm:java21
+FROM findepi/graalvm:java22
 
 WORKDIR /znatokiBot
 
