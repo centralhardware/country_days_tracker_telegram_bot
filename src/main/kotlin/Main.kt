@@ -3,7 +3,7 @@ import dev.inmo.kslog.common.KSLog
 import dev.inmo.kslog.common.configure
 import dev.inmo.kslog.common.info
 import dev.inmo.kslog.common.warning
-import dev.inmo.tgbotapi.bot.ktor.HealthCheckKtorPipelineStepsHolder
+import dev.inmo.tgbotapi.HealthCheck
 import dev.inmo.tgbotapi.extensions.api.bot.setMyCommands
 import dev.inmo.tgbotapi.extensions.api.send.reply
 import dev.inmo.tgbotapi.extensions.behaviour_builder.telegramBotWithBehaviourAndLongPolling
@@ -51,8 +51,6 @@ fun toTimeZone(ts: String): ZoneId = TimeZone.getTimeZone(ts).toZoneId()
 
 fun toCountry(cc: String): String = Locale.of("en", cc).displayCountry
 
-
-val healthChecker: HealthCheckKtorPipelineStepsHolder = HealthCheckKtorPipelineStepsHolder()
 suspend fun main() {
     KSLog.configure("CountryDaysTrackerBot")
     embeddedServer(Netty, port = 80) {
@@ -76,8 +74,8 @@ suspend fun main() {
     telegramBotWithBehaviourAndLongPolling(
         System.getenv("BOT_TOKEN"),
         CoroutineScope(Dispatchers.IO),
-        defaultExceptionsHandler = { t -> KSLog.warning("", t) },
-        builder = { pipelineStepsHolder = healthChecker }) {
+        defaultExceptionsHandler = { t -> KSLog.warning("", t) }) {
+        HealthCheck.addBot(this)
         setMyCommands(
             BotCommand("stat", "вывести статистику")
         )
