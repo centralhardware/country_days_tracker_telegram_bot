@@ -2,8 +2,9 @@ import com.clickhouse.jdbc.ClickHouseDataSource
 import dev.inmo.kslog.common.KSLog
 import dev.inmo.kslog.common.configure
 import dev.inmo.kslog.common.info
-import dev.inmo.kslog.common.warning
 import dev.inmo.tgbotapi.HealthCheck
+import dev.inmo.tgbotapi.KSLogExceptionsHandler
+import dev.inmo.tgbotapi.botToken
 import dev.inmo.tgbotapi.extensions.api.bot.setMyCommands
 import dev.inmo.tgbotapi.extensions.api.send.reply
 import dev.inmo.tgbotapi.extensions.behaviour_builder.telegramBotWithBehaviourAndLongPolling
@@ -72,9 +73,10 @@ suspend fun main() {
         }
     }.start(wait = false)
     telegramBotWithBehaviourAndLongPolling(
-        System.getenv("BOT_TOKEN"),
+        botToken,
         CoroutineScope(Dispatchers.IO),
-        defaultExceptionsHandler = { t -> KSLog.warning("", t) }) {
+        defaultExceptionsHandler = KSLogExceptionsHandler
+    ) {
         HealthCheck.addBot(this)
         setMyCommands(
             BotCommand("stat", "вывести статистику")
@@ -87,7 +89,7 @@ suspend fun main() {
                     """
                                   SELECT country, count(*) as count_of_days
                                   FROM (
-                                    SELECT DISTINCT country,toStartOfDay(date_time)
+                                    SELECT DISTINCT lower(country) as country,toStartOfDay(date_time)
                                     FROM country_days_tracker
                                     WHERE user_id = :user_id
                                   )
@@ -102,21 +104,6 @@ suspend fun main() {
 
             KSLog.info(stat)
             reply(it, stat)
-        }
-        onText {
-            val text = it.text
-            if (text == "/stat") return@onText
-            val arguments = text!!.split(" ")
-            val country = toCountry(arguments[3])
-
-            save(
-                arguments[0].toFloat().round(5),
-                arguments[1].toFloat().round(5),
-                toTimeZone(arguments[2]),
-                country,
-                it.chat.id.chatId.long
-            )
-            reply(it, country)
         }
     }.second.join()
 }
