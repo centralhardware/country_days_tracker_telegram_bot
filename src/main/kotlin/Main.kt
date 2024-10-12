@@ -9,8 +9,7 @@ import dev.inmo.tgbotapi.extensions.api.bot.setMyCommands
 import dev.inmo.tgbotapi.extensions.api.send.reply
 import dev.inmo.tgbotapi.extensions.behaviour_builder.telegramBotWithBehaviourAndLongPolling
 import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onCommand
-import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onText
-import dev.inmo.tgbotapi.extensions.utils.extensions.raw.text
+import dev.inmo.tgbotapi.longPolling
 import dev.inmo.tgbotapi.types.BotCommand
 import io.ktor.http.*
 import io.ktor.server.application.*
@@ -38,9 +37,6 @@ val dataSource: DataSource = try {
 } catch (e: SQLException) {
     throw RuntimeException(e)
 }
-
-fun Float.round(scale: Int): Float =
-    BigDecimal(this.toDouble()).setScale(scale, RoundingMode.HALF_UP).toFloat()
 
 fun prettyDays(countOfDays: Int): String {
     if (countOfDays < 7) return ""
@@ -72,12 +68,7 @@ suspend fun main() {
             }
         }
     }.start(wait = false)
-    telegramBotWithBehaviourAndLongPolling(
-        botToken,
-        CoroutineScope(Dispatchers.IO),
-        defaultExceptionsHandler = KSLogExceptionsHandler
-    ) {
-        HealthCheck.addBot(this)
+    longPolling {
         setMyCommands(
             BotCommand("stat", "вывести статистику")
         )
