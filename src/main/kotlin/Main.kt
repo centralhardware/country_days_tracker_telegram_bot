@@ -1,13 +1,9 @@
 import com.clickhouse.jdbc.ClickHouseDataSource
 import dev.inmo.kslog.common.KSLog
-import dev.inmo.kslog.common.configure
 import dev.inmo.kslog.common.info
-import dev.inmo.tgbotapi.HealthCheck
-import dev.inmo.tgbotapi.KSLogExceptionsHandler
-import dev.inmo.tgbotapi.botToken
+import dev.inmo.tgbotapi.AppConfig
 import dev.inmo.tgbotapi.extensions.api.bot.setMyCommands
 import dev.inmo.tgbotapi.extensions.api.send.reply
-import dev.inmo.tgbotapi.extensions.behaviour_builder.telegramBotWithBehaviourAndLongPolling
 import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onCommand
 import dev.inmo.tgbotapi.longPolling
 import dev.inmo.tgbotapi.types.BotCommand
@@ -17,13 +13,9 @@ import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotliquery.queryOf
 import kotliquery.sessionOf
 import org.ocpsoft.prettytime.PrettyTime
-import java.math.BigDecimal
-import java.math.RoundingMode
 import java.sql.SQLException
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -49,7 +41,7 @@ fun toTimeZone(ts: String): ZoneId = TimeZone.getTimeZone(ts).toZoneId()
 fun toCountry(cc: String): String = Locale.of("en", cc).displayCountry
 
 suspend fun main() {
-    KSLog.configure("CountryDaysTrackerBot")
+    AppConfig.init("CountryDaysTrackerBot")
     embeddedServer(Netty, port = 80) {
         routing {
             post("/location") {
