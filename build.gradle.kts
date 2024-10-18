@@ -8,12 +8,13 @@ version = "1.0-SNAPSHOT"
 repositories {
     mavenCentral()
     maven("https://jitpack.io")
+    maven("https://nexus.inmo.dev/repository/maven-releases/")
 }
 
 val ktorVersion = "2.3.12";
 
 dependencies {
-    implementation("dev.inmo:tgbotapi:18.2.1")
+    implementation("dev.inmo:tgbotapi:18.2.2-branch_18.2.2-build2465")
     implementation("com.github.centralhardware:telegram-bot-commons:d289ac997d")
     implementation("org.apache.httpcomponents.client5:httpclient5:5.3.1")
     implementation("com.clickhouse:clickhouse-jdbc:0.6.5")
