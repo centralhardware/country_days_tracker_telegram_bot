@@ -11,7 +11,7 @@ repositories {
     maven("https://nexus.inmo.dev/repository/maven-releases/")
 }
 
-val ktorVersion = "2.3.12";
+val ktorVersion = "3.0.0";
 
 dependencies {
     implementation("dev.inmo:tgbotapi:18.2.2-branch_18.2.2-build2465")
