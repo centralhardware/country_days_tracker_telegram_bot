@@ -16,7 +16,7 @@ val ktorVersion = "2.3.12";
 dependencies {
     implementation("dev.inmo:tgbotapi:18.2.2-branch_18.2.2-build2465")
     implementation("com.github.centralhardware:telegram-bot-commons:1e503cc156")
-    implementation("org.apache.httpcomponents.client5:httpclient5:5.3.1")
+    implementation("org.apache.httpcomponents.client5:httpclient5:5.4")
     implementation("com.clickhouse:clickhouse-jdbc:0.6.5")
     implementation("org.lz4:lz4-java:1.8.0")
     implementation("org.ocpsoft.prettytime:prettytime:5.0.9.Final")
