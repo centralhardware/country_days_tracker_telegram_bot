@@ -15,5 +15,5 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
   CMD curl --fail http://localhost:81/health || exit 1
 
 
-CMD ["java", "-jar", "shadow-1.0-SNAPSHOT-all.jar" ]
+CMD ["java", "-jar", "shadow-1.0-SNAPSHOT-all.jar", "--add-opens", "java.base/java.lang=ALL-UNNAMED" ]
 
