@@ -15,6 +15,8 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotliquery.queryOf
 import kotliquery.sessionOf
+import me.centralhardware.telegram.EnvironmentVariableUserAccessChecker
+import me.centralhardware.telegram.restrictAccess
 import org.ocpsoft.prettytime.PrettyTime
 import java.sql.SQLException
 import java.time.LocalDateTime
@@ -60,7 +62,7 @@ suspend fun main() {
             }
         }
     }.start(wait = false)
-    longPolling {
+    longPolling({ restrictAccess(EnvironmentVariableUserAccessChecker()) }) {
         setMyCommands(
             BotCommand("stat", "вывести статистику")
         )
