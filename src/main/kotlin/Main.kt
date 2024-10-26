@@ -13,11 +13,6 @@ import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import kotliquery.queryOf
-import kotliquery.sessionOf
-import me.centralhardware.telegram.EnvironmentVariableUserAccessChecker
-import me.centralhardware.telegram.restrictAccess
-import org.ocpsoft.prettytime.PrettyTime
 import java.sql.SQLException
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -25,12 +20,18 @@ import java.time.ZonedDateTime
 import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
 import javax.sql.DataSource
+import kotliquery.queryOf
+import kotliquery.sessionOf
+import me.centralhardware.telegram.EnvironmentVariableUserAccessChecker
+import me.centralhardware.telegram.restrictAccess
+import org.ocpsoft.prettytime.PrettyTime
 
-val dataSource: DataSource = try {
-    ClickHouseDataSource(System.getenv("CLICKHOUSE_URL"))
-} catch (e: SQLException) {
-    throw RuntimeException(e)
-}
+val dataSource: DataSource =
+    try {
+        ClickHouseDataSource(System.getenv("CLICKHOUSE_URL"))
+    } catch (e: SQLException) {
+        throw RuntimeException(e)
+    }
 
 fun prettyDays(countOfDays: Int): String {
     if (countOfDays < 7) return ""
@@ -45,33 +46,43 @@ fun toCountry(cc: String): String = Locale.of("en", cc).displayCountry
 suspend fun main() {
     AppConfig.init("CountryDaysTrackerBot")
     embeddedServer(Netty, port = 80) {
-        routing {
-            post("/location") {
-                val latitude = call.request.queryParameters["latitude"]?.toFloatOrNull()
-                val longitude = call.request.queryParameters["longitude"]?.toFloat()
-                val timezone = call.request.queryParameters["timezone"]
-                val country = call.request.queryParameters["country"]
-                val userId = call.request.queryParameters["userId"]?.toLongOrNull()
+            routing {
+                post("/location") {
+                    val latitude = call.request.queryParameters["latitude"]?.toFloatOrNull()
+                    val longitude = call.request.queryParameters["longitude"]?.toFloat()
+                    val timezone = call.request.queryParameters["timezone"]
+                    val country = call.request.queryParameters["country"]
+                    val userId = call.request.queryParameters["userId"]?.toLongOrNull()
 
-                if (latitude == null || longitude == null || timezone == null || country == null || userId == null) {
-                    call.respond(HttpStatusCode.BadRequest, "Missing or invalid query parameters")
-                } else {
-                    save(latitude, longitude, toTimeZone(timezone), country, userId)
-                    call.respond(HttpStatusCode.OK)
+                    if (
+                        latitude == null ||
+                            longitude == null ||
+                            timezone == null ||
+                            country == null ||
+                            userId == null
+                    ) {
+                        call.respond(
+                            HttpStatusCode.BadRequest,
+                            "Missing or invalid query parameters"
+                        )
+                    } else {
+                        save(latitude, longitude, toTimeZone(timezone), country, userId)
+                        call.respond(HttpStatusCode.OK)
+                    }
                 }
             }
         }
-    }.start(wait = false)
+        .start(wait = false)
     longPolling({ restrictAccess(EnvironmentVariableUserAccessChecker()) }) {
-        setMyCommands(
-            BotCommand("stat", "вывести статистику")
-        )
-        onCommand("stat") {
-            val i = AtomicInteger(1)
+            setMyCommands(BotCommand("stat", "вывести статистику"))
+            onCommand("stat") {
+                val i = AtomicInteger(1)
 
-            val stat = sessionOf(dataSource).run(
-                queryOf(
-                    """
+                val stat =
+                    sessionOf(dataSource)
+                        .run(
+                            queryOf(
+                                    """
                                   SELECT country, count(*) as count_of_days
                                   FROM (
                                     SELECT DISTINCT lower(country) as country,toStartOfDay(date_time)
@@ -81,24 +92,32 @@ suspend fun main() {
                                   GROUP BY country
                                   ORDER BY count(*) DESC
                 """,
-                    mapOf("user_id" to it.chat.id.chatId)
-                ).map { row ->
-                    Pair(row.string("country"), row.int("count_of_days"))
-                }.asList
-            ).joinToString("\n") { "${i.getAndIncrement()} - ${it.first} - ${it.second} (${prettyDays(it.second)})" }
+                                    mapOf("user_id" to it.chat.id.chatId)
+                                )
+                                .map { row ->
+                                    Pair(row.string("country"), row.int("count_of_days"))
+                                }
+                                .asList
+                        )
+                        .joinToString("\n") {
+                            "${i.getAndIncrement()} - ${it.first} - ${it.second} (${prettyDays(it.second)})"
+                        }
 
-            KSLog.info(stat)
-            reply(it, stat)
+                KSLog.info(stat)
+                reply(it, stat)
+            }
         }
-    }.second.join()
+        .second
+        .join()
 }
 
 fun save(latitude: Float, longitude: Float, ts: ZoneId, country: String, userId: Long) {
     KSLog.info("lat: $latitude, lon: $longitude, ts: $ts, cc: $country")
 
-    sessionOf(dataSource).execute(
-        queryOf(
-            """
+    sessionOf(dataSource)
+        .execute(
+            queryOf(
+                """
                               INSERT INTO country_days_tracker
                               ( date_time,
                                 user_id,
@@ -115,14 +134,14 @@ fun save(latitude: Float, longitude: Float, ts: ZoneId, country: String, userId:
                                 :country,
                                 :tzname)
             """,
-            mapOf(
-                "date_time" to ZonedDateTime.now().withZoneSameInstant(ts).toLocalDateTime(),
-                "user_id" to userId,
-                "latitude" to latitude,
-                "longitude" to longitude,
-                "country" to toCountry(country),
-                "tzname" to ts
+                mapOf(
+                    "date_time" to ZonedDateTime.now().withZoneSameInstant(ts).toLocalDateTime(),
+                    "user_id" to userId,
+                    "latitude" to latitude,
+                    "longitude" to longitude,
+                    "country" to toCountry(country),
+                    "tzname" to ts
+                )
             )
         )
-    )
 }
