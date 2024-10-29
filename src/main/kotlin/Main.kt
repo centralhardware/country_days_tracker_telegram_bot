@@ -63,7 +63,7 @@ suspend fun main() {
                     ) {
                         call.respond(
                             HttpStatusCode.BadRequest,
-                            "Missing or invalid query parameters"
+                            "Missing or invalid query parameters",
                         )
                     } else {
                         save(latitude, longitude, toTimeZone(timezone), country, userId)
@@ -92,7 +92,7 @@ suspend fun main() {
                                   GROUP BY country
                                   ORDER BY count(*) DESC
                 """,
-                                    mapOf("user_id" to it.chat.id.chatId)
+                                    mapOf("user_id" to it.chat.id.chatId),
                                 )
                                 .map { row ->
                                     Pair(row.string("country"), row.int("count_of_days"))
@@ -140,8 +140,8 @@ fun save(latitude: Float, longitude: Float, ts: ZoneId, country: String, userId:
                     "latitude" to latitude,
                     "longitude" to longitude,
                     "country" to toCountry(country),
-                    "tzname" to ts
-                )
+                    "tzname" to ts,
+                ),
             )
         )
 }
