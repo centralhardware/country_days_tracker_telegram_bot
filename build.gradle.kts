@@ -17,7 +17,7 @@ repositories {
 val ktorVersion = "2.3.12";
 
 dependencies {
-    implementation("dev.inmo:tgbotapi:18.2.2")
+    implementation("dev.inmo:tgbotapi:18.2.3")
     implementation("com.github.centralhardware:telegram-bot-commons:1aec284aa3")
     implementation("com.github.centralhardware:ktgbotapi-restrict-access-middleware:fe940713c2")
     implementation("org.apache.httpcomponents.client5:httpclient5:5.4.1")
