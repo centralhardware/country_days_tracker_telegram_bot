@@ -14,7 +14,7 @@ repositories {
     maven("https://jitpack.io")
 }
 
-val ktorVersion = "2.3.12";
+val ktorVersion = "3.0.1";
 
 dependencies {
     implementation("dev.inmo:tgbotapi:18.2.2")
