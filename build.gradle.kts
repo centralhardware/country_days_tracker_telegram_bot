@@ -17,9 +17,9 @@ repositories {
 val ktorVersion = "2.3.12";
 
 dependencies {
-    implementation("dev.inmo:tgbotapi:18.2.3")
-    implementation("com.github.centralhardware:telegram-bot-commons:1aec284aa3")
-    implementation("com.github.centralhardware:ktgbotapi-restrict-access-middleware:af385ce6fe")
+    implementation("dev.inmo:tgbotapi:19.0.0")
+    implementation("com.github.centralhardware:telegram-bot-commons:176180cebd")
+    implementation("com.github.centralhardware:ktgbotapi-restrict-access-middleware:9b3be2e3d9")
     implementation("org.apache.httpcomponents.client5:httpclient5:5.4.1")
     implementation("com.clickhouse:clickhouse-jdbc:0.6.5")
     implementation("org.lz4:lz4-java:1.8.0")
