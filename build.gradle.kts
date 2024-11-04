@@ -21,7 +21,7 @@ dependencies {
     implementation("com.github.centralhardware:telegram-bot-commons:f950fa2e33")
     implementation("com.github.centralhardware:ktgbotapi-restrict-access-middleware:9b3be2e3d9")
     implementation("org.apache.httpcomponents.client5:httpclient5:5.4.1")
-    implementation("com.clickhouse:clickhouse-jdbc:0.6.5")
+    implementation("com.clickhouse:clickhouse-jdbc:0.7.1")
     implementation("org.lz4:lz4-java:1.8.0")
     implementation("org.ocpsoft.prettytime:prettytime:5.0.9.Final")
     implementation("com.github.seratch:kotliquery:1.9.0")
