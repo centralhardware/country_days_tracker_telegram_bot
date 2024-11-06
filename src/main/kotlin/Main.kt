@@ -1,18 +1,25 @@
 import com.clickhouse.jdbc.ClickHouseDataSource
 import dev.inmo.kslog.common.KSLog
 import dev.inmo.kslog.common.info
+import dev.inmo.micro_utils.common.Warning
 import dev.inmo.tgbotapi.AppConfig
+import dev.inmo.tgbotapi.Trace
 import dev.inmo.tgbotapi.extensions.api.bot.setMyCommands
 import dev.inmo.tgbotapi.extensions.api.send.reply
 import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onCommand
+import dev.inmo.tgbotapi.extensions.utils.extensions.raw.from
 import dev.inmo.tgbotapi.longPolling
 import dev.inmo.tgbotapi.types.BotCommand
 import io.ktor.http.*
-import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import kotliquery.queryOf
+import kotliquery.sessionOf
+import me.centralhardware.telegram.EnvironmentVariableUserAccessChecker
+import me.centralhardware.telegram.restrictAccess
+import org.ocpsoft.prettytime.PrettyTime
 import java.sql.SQLException
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -20,11 +27,6 @@ import java.time.ZonedDateTime
 import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
 import javax.sql.DataSource
-import kotliquery.queryOf
-import kotliquery.sessionOf
-import me.centralhardware.telegram.EnvironmentVariableUserAccessChecker
-import me.centralhardware.telegram.restrictAccess
-import org.ocpsoft.prettytime.PrettyTime
 
 val dataSource: DataSource =
     try {
@@ -43,6 +45,7 @@ fun toTimeZone(ts: String): ZoneId = TimeZone.getTimeZone(ts).toZoneId()
 
 fun toCountry(cc: String): String = Locale.of("en", cc).displayCountry
 
+@OptIn(Warning::class)
 suspend fun main() {
     AppConfig.init("CountryDaysTrackerBot")
     embeddedServer(Netty, port = 80) {
@@ -78,6 +81,7 @@ suspend fun main() {
             onCommand("stat") {
                 val i = AtomicInteger(1)
 
+                Trace.save("checkStat", mapOf("chatId" to it.from!!.id.chatId.long.toString()))
                 val stat =
                     sessionOf(dataSource)
                         .run(
