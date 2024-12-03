@@ -17,9 +17,9 @@ val ktorVersion = "2.3.12";
 val clickhouseVersion = "0.7.1-patch1"
 
 dependencies {
-    implementation("dev.inmo:tgbotapi:20.0.1")
-    implementation("com.github.centralhardware:telegram-bot-commons:d96b131958")
-    implementation("com.github.centralhardware:ktgbotapi-restrict-access-middleware:9b3be2e3d9")
+    implementation("dev.inmo:tgbotapi:21.0.0")
+    implementation("com.github.centralhardware:telegram-bot-commons:34c054a4a1")
+    implementation("com.github.centralhardware:ktgbotapi-restrict-access-middleware:af91d53cf9")
     implementation("com.clickhouse:clickhouse-jdbc:$clickhouseVersion")
     implementation("com.clickhouse:clickhouse-http-client:$clickhouseVersion")
     implementation("org.lz4:lz4-java:1.8.0")
