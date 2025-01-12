@@ -10,6 +10,7 @@ import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onComman
 import dev.inmo.tgbotapi.extensions.utils.extensions.raw.from
 import dev.inmo.tgbotapi.longPolling
 import dev.inmo.tgbotapi.types.BotCommand
+import dev.inmo.tgbotapi.utils.RiskFeature
 import io.ktor.http.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
@@ -19,9 +20,7 @@ import kotliquery.queryOf
 import kotliquery.sessionOf
 import me.centralhardware.telegram.EnvironmentVariableUserAccessChecker
 import me.centralhardware.telegram.restrictAccess
-import org.ocpsoft.prettytime.PrettyTime
 import java.sql.SQLException
-import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.*
@@ -35,17 +34,11 @@ val dataSource: DataSource =
         throw RuntimeException(e)
     }
 
-fun prettyDays(countOfDays: Int): String {
-    if (countOfDays < 7) return ""
-
-    return PrettyTime(Locale.US).formatDuration(LocalDateTime.now().plusDays(countOfDays.toLong()))
-}
-
 fun toTimeZone(ts: String): ZoneId = TimeZone.getTimeZone(ts).toZoneId()
 
 fun toCountry(cc: String): String = Locale.of("en", cc).displayCountry
 
-@OptIn(Warning::class)
+@OptIn(Warning::class, RiskFeature::class)
 suspend fun main() {
     AppConfig.init("CountryDaysTrackerBot")
     embeddedServer(Netty, port = 80) {
@@ -104,7 +97,7 @@ suspend fun main() {
                                 .asList
                         )
                         .joinToString("\n") {
-                            "${i.getAndIncrement()} - ${it.first} - ${it.second} (${prettyDays(it.second)})"
+                            "${i.getAndIncrement()} - ${it.first} - ${it.second}"
                         }
 
                 KSLog.info(stat)

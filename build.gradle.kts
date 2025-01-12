@@ -23,7 +23,6 @@ dependencies {
     implementation("com.clickhouse:clickhouse-jdbc:$clickhouseVersion")
     implementation("com.clickhouse:clickhouse-http-client:$clickhouseVersion")
     implementation("org.lz4:lz4-java:1.8.0")
-    implementation("org.ocpsoft.prettytime:prettytime:5.0.9.Final")
     implementation("com.github.seratch:kotliquery:1.9.0")
     implementation("io.ktor:ktor-server-netty:$ktorVersion")
     implementation("io.ktor:ktor-server-core:$ktorVersion")
