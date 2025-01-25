@@ -83,7 +83,7 @@ suspend fun main() {
                                   SELECT country, count(*) as count_of_days
                                   FROM (
                                     SELECT DISTINCT lower(country) as country,toStartOfDay(date_time)
-                                    FROM country_days_tracker
+                                    FROM country_days_tracker_bot.country_days_tracker
                                     WHERE user_id = :user_id
                                   )
                                   GROUP BY country
@@ -115,7 +115,7 @@ fun save(latitude: Float, longitude: Float, ts: ZoneId, country: String, userId:
         .execute(
             queryOf(
                 """
-                              INSERT INTO country_days_tracker
+                              INSERT INTO country_days_tracker_bot.country_days_tracker
                               ( date_time,
                                 user_id,
                                 latitude,
