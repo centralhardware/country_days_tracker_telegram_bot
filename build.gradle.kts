@@ -18,7 +18,7 @@ val clickhouseVersion = "0.8.0"
 
 dependencies {
     implementation("dev.inmo:tgbotapi:23.1.0")
-    implementation("com.github.centralhardware:telegram-bot-commons:2b13fe6b9f")
+    implementation("com.github.centralhardware:telegram-bot-commons:8e638b8b19")
     implementation("com.github.centralhardware:ktgbotapi-restrict-access-middleware:b0e1f48293")
     implementation("com.clickhouse:clickhouse-jdbc:$clickhouseVersion")
     implementation("com.clickhouse:clickhouse-http-client:$clickhouseVersion")
