@@ -62,7 +62,8 @@ suspend fun main() {
                             "Missing or invalid query parameters",
                         )
                     } else {
-                        save(latitude, longitude, toTimeZone(timezone), country, userId)
+                        runCatching { save(latitude, longitude, toTimeZone(timezone), country, userId) }
+                            .onFailure(::println)
                         call.respond(HttpStatusCode.OK)
                     }
                 }
