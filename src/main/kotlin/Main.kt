@@ -17,13 +17,10 @@ import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
 import kotliquery.queryOf
 import kotliquery.sessionOf
 import me.centralhardware.telegram.EnvironmentVariableUserAccessChecker
 import me.centralhardware.telegram.restrictAccess
-import java.net.URL
 import java.sql.SQLException
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -105,8 +102,6 @@ suspend fun main() {
                     append(stat.joinToString("\n") { "${i.getAndIncrement()} - ${it.first} - ${it.second}" })
                     append("\n\n")
                     append(calculateVisitedPercentage(stat.size))
-                    append("\n\n")
-                    append(calculateVisitedByRegion(stat.map { it.first }.toSet()))
                 }
 
                 KSLog.info(stat)
@@ -152,40 +147,9 @@ fun save(latitude: Float, longitude: Float, ts: ZoneId, country: String, userId:
         )
 }
 
-@Serializable
-data class CountryName(val common: String)
-
-@Serializable
-data class CountryInfo(val name: CountryName, val region: String)
-
-val JSON = Json { ignoreUnknownKeys = true }
-const val URL = "https://restcountries.com/v3.1/all"
-fun fetchCountryData(): Map<String, String> {
-    val response = URL(URL).readText()
-    val countries = JSON.decodeFromString<List<CountryInfo>>(response)
-    return countries.associate { it.name.common.lowercase() to it.region }
-}
-
 const val TOTAL_COUNTRIES = 193
 fun calculateVisitedPercentage(visitedCountries: Int): String {
     val percent =  (visitedCountries.toDouble() / TOTAL_COUNTRIES) * 100
     return "You have visited %.2f%% of the world".format(percent)
-}
-
-fun calculateVisitedByRegion(visitedCountries: Set<String>): String {
-    val countryToRegion = fetchCountryData()
-    val regionCounts = countryToRegion.values.groupingBy { it }.eachCount()
-    val visitedByRegion = visitedCountries.groupingBy { countryToRegion[it.lowercase().replace("&", "and").replace("türkiye", "turkey")] ?: "Unknown" }.eachCount()
-
-    val stat = visitedByRegion.mapValues { (region, visitedCount) ->
-        val total = regionCounts[region] ?: return@mapValues 0.0
-        (visitedCount.toDouble() / total) * 100
-    }
-
-    return buildString {
-        stat.forEach { k,v ->
-            append("$k %.2f%%\n".format(v))
-        }
-    }
 }
 
