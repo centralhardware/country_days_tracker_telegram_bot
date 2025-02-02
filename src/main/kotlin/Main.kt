@@ -1,3 +1,4 @@
+
 import com.clickhouse.jdbc.ClickHouseDataSource
 import dev.inmo.kslog.common.KSLog
 import dev.inmo.kslog.common.info
@@ -16,10 +17,13 @@ import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 import kotliquery.queryOf
 import kotliquery.sessionOf
 import me.centralhardware.telegram.EnvironmentVariableUserAccessChecker
 import me.centralhardware.telegram.restrictAccess
+import java.net.URL
 import java.sql.SQLException
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -97,12 +101,15 @@ suspend fun main() {
                                 }
                                 .asList
                         )
-                        .joinToString("\n") {
-                            "${i.getAndIncrement()} - ${it.first} - ${it.second}"
-                        }
+                val msg = """
+                    ${stat.joinToString("\n") { "${i.getAndIncrement()} - ${it.first} - ${it.second}" }}
+                    ${calculateVisitedPercentage(stat.size)}    
+                    ${calculateVisitedByRegion(stat.map { it.first }.toSet())}
+                }
+                """.trimIndent()
 
                 KSLog.info(stat)
-                reply(it, stat)
+                reply(it, msg)
             }
         }
         .second
@@ -143,3 +150,37 @@ fun save(latitude: Float, longitude: Float, ts: ZoneId, country: String, userId:
             )
         )
 }
+
+@Serializable
+data class CountryInfo(val name: String, val region: String)
+
+fun fetchCountryData(): Map<String, String> {
+    val apiUrl = "https://restcountries.com/v3.1/all"
+    val response = URL(apiUrl).readText()
+    val countries = Json.decodeFromString<List<CountryInfo>>(response)
+    return countries.associate { it.name to it.region }
+}
+
+val TOTAL_COUNTRIES = 195
+fun calculateVisitedPercentage(visitedCountries: Int): String {
+    val percent =  (visitedCountries.toDouble() / TOTAL_COUNTRIES) * 100
+    return "$percent of world visited"
+}
+
+fun calculateVisitedByRegion(visitedCountries: Set<String>): String {
+    val countryToRegion = fetchCountryData()
+    val regionCounts = countryToRegion.values.groupingBy { it }.eachCount()
+    val visitedByRegion = visitedCountries.groupingBy { countryToRegion[it] ?: "Unknown" }.eachCount()
+
+    val stat = visitedByRegion.mapValues { (region, visitedCount) ->
+        val total = regionCounts[region] ?: return@mapValues 0.0
+        (visitedCount.toDouble() / total) * 100
+    }
+
+    return buildString {
+        stat.forEach { k,v ->
+            append("$k $v\n")
+        }
+    }
+}
+
