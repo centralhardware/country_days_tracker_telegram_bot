@@ -184,7 +184,7 @@ fun calculateVisitedByRegion(visitedCountries: Set<String>): String {
 
     return buildString {
         stat.forEach { k,v ->
-            append("$k $v\n")
+            append("$k %.2f%%\n".format(v))
         }
     }
 }
