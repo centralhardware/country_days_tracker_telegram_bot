@@ -101,12 +101,13 @@ suspend fun main() {
                                 }
                                 .asList
                         )
-                val msg = """
-                    ${stat.joinToString("\n") { "${i.getAndIncrement()} - ${it.first} - ${it.second}" }}
-                    ${calculateVisitedPercentage(stat.size)}    
-                    ${calculateVisitedByRegion(stat.map { it.first }.toSet())}
+                val msg = buildString {
+                    append(stat.joinToString("\n") { "${i.getAndIncrement()} - ${it.first} - ${it.second}" })
+                    append("\n\n")
+                    append(calculateVisitedPercentage(stat.size))
+                    append("\n\n")
+                    append(calculateVisitedByRegion(stat.map { it.first }.toSet()))
                 }
-                """.trimIndent()
 
                 KSLog.info(stat)
                 reply(it, msg)
@@ -152,25 +153,29 @@ fun save(latitude: Float, longitude: Float, ts: ZoneId, country: String, userId:
 }
 
 @Serializable
-data class CountryInfo(val name: String, val region: String)
+data class CountryName(val common: String)
 
+@Serializable
+data class CountryInfo(val name: CountryName, val region: String)
+
+val JSON = Json { ignoreUnknownKeys = true }
+const val URL = "https://restcountries.com/v3.1/all"
 fun fetchCountryData(): Map<String, String> {
-    val apiUrl = "https://restcountries.com/v3.1/all"
-    val response = URL(apiUrl).readText()
-    val countries = Json.decodeFromString<List<CountryInfo>>(response)
-    return countries.associate { it.name to it.region }
+    val response = URL(URL).readText()
+    val countries = JSON.decodeFromString<List<CountryInfo>>(response)
+    return countries.associate { it.name.common.lowercase() to it.region }
 }
 
-val TOTAL_COUNTRIES = 195
+const val TOTAL_COUNTRIES = 193
 fun calculateVisitedPercentage(visitedCountries: Int): String {
     val percent =  (visitedCountries.toDouble() / TOTAL_COUNTRIES) * 100
-    return "$percent of world visited"
+    return "You have visited %.2f%% of the world".format(percent)
 }
 
 fun calculateVisitedByRegion(visitedCountries: Set<String>): String {
     val countryToRegion = fetchCountryData()
     val regionCounts = countryToRegion.values.groupingBy { it }.eachCount()
-    val visitedByRegion = visitedCountries.groupingBy { countryToRegion[it] ?: "Unknown" }.eachCount()
+    val visitedByRegion = visitedCountries.groupingBy { countryToRegion[it.lowercase().replace("&", "and").replace("türkiye", "turkey")] ?: "Unknown" }.eachCount()
 
     val stat = visitedByRegion.mapValues { (region, visitedCount) ->
         val total = regionCounts[region] ?: return@mapValues 0.0
