@@ -99,7 +99,7 @@ suspend fun main() {
                                 .asList
                         )
                 val msg = buildString {
-                    append(stat.joinToString("\n") { "${i.getAndIncrement()} - ${it.first} - ${it.second}" })
+                    append(stat.joinToString("\n") { "${i.getAndIncrement()} - ${it.first} - ${it.second}(${prettyTime(it.second)})" })
                     append("\n\n")
                     append(calculateVisitedPercentage(stat.size))
                 }
@@ -153,3 +153,24 @@ fun calculateVisitedPercentage(visitedCountries: Int): String {
     return "You have visited %.2f%% of the world".format(percent)
 }
 
+fun prettyTime(totalDays: Int): String {
+    val years = (totalDays / 365.25).toInt()
+    val remainingDaysAfterYears = (totalDays % 365.25).toInt()
+
+    val months = (remainingDaysAfterYears / 30.44).toInt()
+    val remainingDaysAfterMonths = (remainingDaysAfterYears % 30.44).toInt()
+
+    val weeks = (remainingDaysAfterMonths / 7).toInt()
+    val days = (remainingDaysAfterMonths % 7).toInt()
+
+    val parts = mutableListOf<String>()
+
+    if (years > 0) parts.add("$years years")
+    if (months > 0) parts.add("$months months")
+    if (weeks > 0) parts.add("$weeks weeks")
+    if (weeks > 0 || months > 0 || years > 0) {
+        if (days > 0) parts.add("$days days")
+    }
+
+    return parts.joinToString(", ").ifEmpty { "" }
+}
