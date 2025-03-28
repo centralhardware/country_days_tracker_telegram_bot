@@ -101,8 +101,8 @@ suspend fun main() {
                 val msg = buildString {
                     append(stat.joinToString("\n") { "${i.getAndIncrement()} - ${it.first} - ${it.second}(${prettyTime(it.second)})" })
                     append("\n\n")
-                    append(calculateVisitedPercentage(stat.size))
-                    append("Current country:" + getCurrentCountryLength() + "\n")
+                    append(calculateVisitedPercentage(stat.size) + "\n")
+                    append("Current country:" + getCurrentCountryLength())
                 }
 
                 KSLog.info(stat)
