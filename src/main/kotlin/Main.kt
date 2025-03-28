@@ -102,6 +102,7 @@ suspend fun main() {
                     append(stat.joinToString("\n") { "${i.getAndIncrement()} - ${it.first} - ${it.second}(${prettyTime(it.second)})" })
                     append("\n\n")
                     append(calculateVisitedPercentage(stat.size))
+                    append("Current country:" + getCurrentCountryLength() + "\n")
                 }
 
                 KSLog.info(stat)
@@ -173,4 +174,57 @@ fun prettyTime(totalDays: Int): String {
     }
 
     return parts.joinToString(", ").ifEmpty { "" }
+}
+
+fun getCurrentCountryLength(): String {
+    var res = sessionOf(dataSource)
+        .run(queryOf(
+            """
+               WITH
+    -- Убираем время, оставляем только дату
+    data AS (
+        SELECT
+            user_id,
+            toDate(date_time) AS day,
+            country
+        FROM country_days_tracker
+        GROUP BY
+            user_id, day, country
+    ),
+
+    -- Определяем границы "сессий" по смене страны
+    with_sessions AS (
+        SELECT
+            *,
+            row_number() OVER (PARTITION BY user_id ORDER BY day) -
+            row_number() OVER (PARTITION BY user_id, country ORDER BY day) AS session_id
+        FROM data
+    ),
+
+    -- Группируем по сессиям, считаем продолжительность
+    sessions_grouped AS (
+        SELECT
+            user_id,
+            country,
+            min(day) AS start_day,
+            max(day) AS end_day,
+            count() AS days_in_country
+        FROM with_sessions
+        GROUP BY
+            user_id, country, session_id
+    )
+
+-- Выводим только текущую сессию (максимальную по дате)
+SELECT
+    country,
+    days_in_country
+FROM (
+         SELECT *,
+                row_number() OVER (PARTITION BY user_id ORDER BY end_day DESC) AS rn
+         FROM sessions_grouped
+         )
+WHERE rn = 1 
+            """, mapOf()
+        ).map { row -> Pair(row.string("country"), row.int("days_in_country")) }.asSingle)!!
+    return "${res.first} ${res.second}"
 }
