@@ -1,13 +1,15 @@
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-
 plugins {
     kotlin("jvm") version "2.1.20"
-    id("com.github.johnrengelman.shadow") version "8.1.1"
     kotlin("plugin.serialization") version "2.1.20"
+    application
 }
 
 group = "me.centralhardware"
 version = "1.0-SNAPSHOT"
+
+application {
+    mainClass.set("MainKt")
+}
 
 repositories {
     mavenCentral()
@@ -36,12 +38,3 @@ kotlin {
     jvmToolchain(21)
 }
 
-tasks {
-    named<ShadowJar>("shadowJar") {
-        archiveBaseName.set("shadow")
-        mergeServiceFiles()
-        manifest {
-            attributes(mapOf("Main-Class" to "MainKt"))
-        }
-    }
-}
