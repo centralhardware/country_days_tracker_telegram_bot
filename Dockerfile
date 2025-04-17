@@ -8,7 +8,7 @@ FROM findepi/graalvm:java22
 
 WORKDIR /app
 
-COPY --from=gradle /home/gradle/build/install/country_days_tracker_bot/ ./
+COPY --from=gradle /home/gradle/build/install/countryDaysTrackerBotKotlin/ ./
 
 RUN apt-get update && apt-get install -y curl && apt-get clean && rm -rf /var/lib/apt/lists/*
 HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
