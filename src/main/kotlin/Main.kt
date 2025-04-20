@@ -12,56 +12,19 @@ import dev.inmo.tgbotapi.extensions.utils.extensions.raw.from
 import dev.inmo.tgbotapi.longPolling
 import dev.inmo.tgbotapi.types.BotCommand
 import dev.inmo.tgbotapi.utils.RiskFeature
-import io.ktor.http.*
-import io.ktor.server.engine.*
-import io.ktor.server.netty.*
-import io.ktor.server.response.*
-import io.ktor.server.routing.*
 import me.centralhardware.telegram.EnvironmentVariableUserAccessChecker
 import me.centralhardware.telegram.restrictAccess
-import java.time.ZoneId
-import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
 
-// Database service instance
+// Service instances
 private val dbService = DatabaseService()
-
-fun toTimeZone(ts: String): ZoneId = TimeZone.getTimeZone(ts).toZoneId()
-
-fun toCountry(cc: String): String = Locale.of("en", cc).displayCountry
+private val webService = WebService(dbService)
 
 @OptIn(Warning::class, RiskFeature::class)
 suspend fun main() {
     AppConfig.init("CountryDaysTrackerBot")
-    embeddedServer(Netty, port = 80) {
-            routing {
-                post("/location") {
-                    val latitude = call.request.queryParameters["latitude"]?.toFloatOrNull()
-                    val longitude = call.request.queryParameters["longitude"]?.toFloat()
-                    val timezone = call.request.queryParameters["timezone"]
-                    val country = call.request.queryParameters["country"]
-                    val userId = call.request.queryParameters["userId"]?.toLongOrNull()
-
-                    if (
-                        latitude == null ||
-                            longitude == null ||
-                            timezone == null ||
-                            country == null ||
-                            userId == null
-                    ) {
-                        call.respond(
-                            HttpStatusCode.BadRequest,
-                            "Missing or invalid query parameters",
-                        )
-                    } else {
-                        runCatching { dbService.save(latitude, longitude, toTimeZone(timezone), toCountry(country), userId) }
-                            .onFailure(::println)
-                        call.respond(HttpStatusCode.OK)
-                    }
-                }
-            }
-        }
-        .start(wait = false)
+    // Start the web service
+    webService.start(80)
     longPolling({ restrictAccess(EnvironmentVariableUserAccessChecker()) }) {
             setMyCommands(
                 BotCommand("stat", "show statistics"),

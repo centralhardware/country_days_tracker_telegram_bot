@@ -17,7 +17,7 @@ repositories {
 }
 
 val ktorVersion = "3.1.2";
-val clickhouseVersion = "0.8.3"
+val clickhouseVersion = "0.8.4"
 
 dependencies {
     implementation("dev.inmo:tgbotapi:24.0.2")
@@ -34,7 +34,3 @@ dependencies {
 tasks.test {
     useJUnitPlatform()
 }
-kotlin {
-    jvmToolchain(21)
-}
-
