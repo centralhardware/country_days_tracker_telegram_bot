@@ -4,7 +4,7 @@ COPY ./ ./
 
 RUN gradle installDist
 
-FROM findepi/graalvm:java23
+FROM openjdk:23-slim
 
 WORKDIR /app
 
