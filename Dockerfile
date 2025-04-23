@@ -1,10 +1,10 @@
-FROM gradle:jdk22-graal as gradle
+FROM gradle:jdk23-graal as gradle
 
 COPY ./ ./
 
 RUN gradle installDist
 
-FROM findepi/graalvm:java22
+FROM findepi/graalvm:java23
 
 WORKDIR /app
 
