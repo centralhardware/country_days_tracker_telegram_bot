@@ -9,6 +9,9 @@ version = "1.0-SNAPSHOT"
 
 application {
     mainClass.set("MainKt")
+    applicationDefaultJvmArgs = listOf(
+        "--add-opens=java.base/java.lang=ALL-UNNAMED"
+    )
 }
 
 repositories {

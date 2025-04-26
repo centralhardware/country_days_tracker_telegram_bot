@@ -14,5 +14,4 @@ RUN apt-get update && apt-get install -y curl && apt-get clean && rm -rf /var/li
 HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
   CMD curl --fail http://localhost:81/health || exit 1
 
-JAVA_OPTS="--add-opens=java.base/java.lang=ALL-UNNAMED"
-exec java $JAVA_OPTS -cp "$CLASSPATH" MainKt "$@"
+CMD ["./bin/countryDaysTrackerBotKotlin", "--add-opens", "java.base/java.lang=ALL-UNNAMED"]
