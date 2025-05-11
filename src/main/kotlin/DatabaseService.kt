@@ -20,10 +20,10 @@ class DatabaseService {
     }
 
     fun save(
-        latitude: Float, 
-        longitude: Float, 
-        ts: ZoneId, 
-        country: String, 
+        latitude: Float,
+        longitude: Float,
+        ts: ZoneId,
+        country: String,
         userId: Long,
         alt: Int,
         batt: Int,
@@ -39,65 +39,48 @@ class DatabaseService {
                 "alt: $alt, batt: $batt, acc: $acc, vac: $vac, conn: $conn, " +
                 "locality: $locality, ghash: $ghash, p: $p, addr: $addr")
 
-        sessionOf(dataSource)
-            .execute(
+        sessionOf(dataSource).use { session ->
+            session.execute(
                 queryOf(
                     """
-                    INSERT INTO country_days_tracker_bot.country_days_tracker
-                    ( date_time,
-                      user_id,
-                      latitude,
-                      longitude,
-                      country,
-                      tzname,
-                      alt,
-                      batt,
-                      acc,
-                      vac,
-                      conn,
-                      locality,
-                      ghash,
-                      p,
-                      addr
-                    )
-                    VALUES (
-                      CAST(? AS DateTime),
-                      CAST(? AS Int64),
-                      CAST(? AS Float32),
-                      CAST(? AS Float32),
-                      CAST(? AS String),
-                      CAST(? AS String),
-                      CAST(? AS UInt16),
-                      CAST(? AS UInt8),
-                      CAST(? AS UInt8),
-                      CAST(? AS UInt8),
-                      CAST(? AS String),
-                      CAST(? AS String),
-                      CAST(? AS String),
-                      CAST(? AS Float64),
-                      CAST(? AS String)
-                    )
-                    """,
-                    listOf(
-                        ZonedDateTime.now().withZoneSameInstant(ts).toLocalDateTime(),
-                        userId,
-                        latitude,
-                        longitude,
-                        country,
-                        ts.id,
-                        alt,
-                        batt,
-                        acc,
-                        vac,
-                        conn,
-                        locality,
-                        ghash,
-                        p,
-                        addr
-                    ),
+                INSERT INTO country_days_tracker_bot.country_days_tracker
+                SELECT 
+                    toDateTime(?) AS date_time,
+                    toInt64(?) AS user_id,
+                    toFloat32(?) AS latitude,
+                    toFloat32(?) AS longitude,
+                    toString(?) AS country,
+                    toString(?) AS tzname,
+                    toUInt16(?) AS alt,
+                    toUInt8(?) AS batt,
+                    toUInt8(?) AS acc,
+                    toUInt8(?) AS vac,
+                    toString(?) AS conn,
+                    toString(?) AS locality,
+                    toString(?) AS ghash,
+                    toFloat64(?) AS p,
+                    toString(?) AS addr
+                """,
+                    ZonedDateTime.now().withZoneSameInstant(ts).toLocalDateTime(),
+                    userId,
+                    latitude,
+                    longitude,
+                    country,
+                    ts.id,
+                    alt,
+                    batt,
+                    acc,
+                    vac,
+                    conn,
+                    locality,
+                    ghash,
+                    p,
+                    addr
                 )
             )
+        }
     }
+
 
     fun getCountryStats(userId: Long): List<Pair<String, Int>> {
         return sessionOf(dataSource)
