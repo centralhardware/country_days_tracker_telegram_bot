@@ -60,7 +60,23 @@ class DatabaseService {
                       p,
                       addr
                     )
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    VALUES (
+                      CAST(? AS DateTime),
+                      CAST(? AS Int64),
+                      CAST(? AS Float32),
+                      CAST(? AS Float32),
+                      CAST(? AS String),
+                      CAST(? AS String),
+                      CAST(? AS UInt16),
+                      CAST(? AS UInt8),
+                      CAST(? AS UInt8),
+                      CAST(? AS UInt8),
+                      CAST(? AS String),
+                      CAST(? AS String),
+                      CAST(? AS String),
+                      CAST(? AS Float64),
+                      CAST(? AS String)
+                    )
                     """,
                     listOf(
                         ZonedDateTime.now().withZoneSameInstant(ts).toLocalDateTime(),
