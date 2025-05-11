@@ -60,39 +60,24 @@ class DatabaseService {
                       p,
                       addr
                     )
-                    VALUES (
-                      :date_time,
-                      :user_id,
-                      :latitude,
-                      :longitude,
-                      :country,
-                      :tzname,
-                      :alt,
-                      :batt,
-                      :acc,
-                      :vac,
-                      :conn,
-                      :locality,
-                      :ghash,
-                      :p::Float64,
-                      :addr::String)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     """,
-                    mapOf(
-                        "date_time" to ZonedDateTime.now().withZoneSameInstant(ts).toLocalDateTime(),
-                        "user_id" to userId,
-                        "latitude" to latitude,
-                        "longitude" to longitude,
-                        "country" to country,
-                        "tzname" to ts.id,
-                        "alt" to alt,
-                        "batt" to batt,
-                        "acc" to acc,
-                        "vac" to vac,
-                        "conn" to conn,
-                        "locality" to locality,
-                        "ghash" to ghash,
-                        "p" to p,
-                        "addr" to addr
+                    listOf(
+                        ZonedDateTime.now().withZoneSameInstant(ts).toLocalDateTime(),
+                        userId,
+                        latitude,
+                        longitude,
+                        country,
+                        ts.id,
+                        alt,
+                        batt,
+                        acc,
+                        vac,
+                        conn,
+                        locality,
+                        ghash,
+                        p,
+                        addr
                     ),
                 )
             )
