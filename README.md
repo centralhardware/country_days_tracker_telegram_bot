@@ -57,7 +57,16 @@ CREATE TABLE country_days_tracker_bot.country_days_tracker (
     latitude Float32,
     longitude Float32,
     country String,
-    tzname String
+    tzname String,
+    alt Int32,
+    batt Int32,
+    acc Int32,
+    vac Int32,
+    conn String,
+    locality String,
+    ghash String,
+    p Float64,
+    addr String
 ) ENGINE = MergeTree()
 ORDER BY (user_id, date_time);
 ```

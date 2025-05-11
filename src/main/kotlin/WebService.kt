@@ -46,8 +46,21 @@ class WebService(private val databaseService: DatabaseService) {
             val country = call.request.queryParameters["country"]
             val userId = call.request.queryParameters["userId"]?.toLongOrNull()
 
+            // Additional parameters
+            val alt = call.request.queryParameters["alt"]?.toIntOrNull()
+            val batt = call.request.queryParameters["batt"]?.toIntOrNull()
+            val acc = call.request.queryParameters["acc"]?.toIntOrNull()
+            val vac = call.request.queryParameters["vac"]?.toIntOrNull()
+            val conn = call.request.queryParameters["conn"]
+            val locality = call.request.queryParameters["locality"]
+            val ghash = call.request.queryParameters["ghash"]
+            val p = call.request.queryParameters["p"]?.toDoubleOrNull()
+            val addr = call.request.queryParameters["addr"]
+
             if (latitude == null || longitude == null || timezone == null || 
-                country == null || userId == null) {
+                country == null || userId == null || alt == null || batt == null || 
+                acc == null || vac == null || conn == null || locality == null || 
+                ghash == null || p == null || addr == null) {
 
                 KSLog.info("Received invalid location update request: missing or invalid parameters")
                 call.respond(
@@ -57,7 +70,8 @@ class WebService(private val databaseService: DatabaseService) {
                 return
             }
 
-            KSLog.info("Processing location update: lat=$latitude, lon=$longitude, country=$country, userId=$userId")
+            KSLog.info("Processing location update: lat=$latitude, lon=$longitude, country=$country, userId=$userId, " +
+                    "alt=$alt, batt=$batt, acc=$acc, vac=$vac, conn=$conn, locality=$locality, ghash=$ghash, p=$p, addr=$addr")
 
             runCatching { 
                 databaseService.save(
@@ -65,7 +79,16 @@ class WebService(private val databaseService: DatabaseService) {
                     longitude, 
                     toTimeZone(timezone), 
                     toCountry(country), 
-                    userId
+                    userId,
+                    alt,
+                    batt,
+                    acc,
+                    vac,
+                    conn,
+                    locality,
+                    ghash,
+                    p,
+                    addr
                 ) 
             }.onSuccess {
                 KSLog.info("Successfully saved location update")

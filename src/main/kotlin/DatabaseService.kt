@@ -19,8 +19,25 @@ class DatabaseService {
         }
     }
 
-    fun save(latitude: Float, longitude: Float, ts: ZoneId, country: String, userId: Long) {
-        KSLog.info("lat: $latitude, lon: $longitude, ts: $ts, cc: $country")
+    fun save(
+        latitude: Float, 
+        longitude: Float, 
+        ts: ZoneId, 
+        country: String, 
+        userId: Long,
+        alt: Int,
+        batt: Int,
+        acc: Int,
+        vac: Int,
+        conn: String,
+        locality: String,
+        ghash: String,
+        p: Double,
+        addr: String
+    ) {
+        KSLog.info("lat: $latitude, lon: $longitude, ts: $ts, cc: $country, " +
+                "alt: $alt, batt: $batt, acc: $acc, vac: $vac, conn: $conn, " +
+                "locality: $locality, ghash: $ghash, p: $p, addr: $addr")
 
         sessionOf(dataSource)
             .execute(
@@ -32,7 +49,16 @@ class DatabaseService {
                       latitude,
                       longitude,
                       country,
-                      tzname
+                      tzname,
+                      alt,
+                      batt,
+                      acc,
+                      vac,
+                      conn,
+                      locality,
+                      ghash,
+                      p,
+                      addr
                     )
                     VALUES (
                       :date_time,
@@ -40,7 +66,16 @@ class DatabaseService {
                       :latitude,
                       :longitude,
                       :country,
-                      :tzname)
+                      :tzname,
+                      :alt,
+                      :batt,
+                      :acc,
+                      :vac,
+                      :conn,
+                      :locality,
+                      :ghash,
+                      :p,
+                      :addr)
                     """,
                     mapOf(
                         "date_time" to ZonedDateTime.now().withZoneSameInstant(ts).toLocalDateTime(),
@@ -49,6 +84,15 @@ class DatabaseService {
                         "longitude" to longitude,
                         "country" to country,
                         "tzname" to ts.id,
+                        "alt" to alt,
+                        "batt" to batt,
+                        "acc" to acc,
+                        "vac" to vac,
+                        "conn" to conn,
+                        "locality" to locality,
+                        "ghash" to ghash,
+                        "p" to p,
+                        "addr" to addr
                     ),
                 )
             )
