@@ -1,4 +1,3 @@
-
 import com.clickhouse.jdbc.ClickHouseDataSource
 import dev.inmo.kslog.common.KSLog
 import dev.inmo.kslog.common.info
@@ -35,32 +34,35 @@ class DatabaseService {
         p: Double,
         addr: String
     ) {
-        KSLog.info("lat: $latitude, lon: $longitude, ts: $ts, cc: $country, " +
-                "alt: $alt, batt: $batt, acc: $acc, vac: $vac, conn: $conn, " +
-                "locality: $locality, ghash: $ghash, p: $p, addr: $addr")
+        KSLog.info(
+            "lat: $latitude, lon: $longitude, ts: $ts, cc: $country, " +
+                    "alt: $alt, batt: $batt, acc: $acc, vac: $vac, conn: $conn, " +
+                    "locality: $locality, ghash: $ghash, p: $p, addr: $addr"
+        )
 
         sessionOf(dataSource).use { session ->
             session.execute(
                 queryOf(
                     """
-                INSERT INTO country_days_tracker_bot.country_days_tracker
-                SELECT 
-                    toDateTime(?) AS date_time,
-                    toInt64(?) AS user_id,
-                    toFloat32(?) AS latitude,
-                    toFloat32(?) AS longitude,
-                    toString(?) AS country,
-                    toString(?) AS tzname,
-                    toUInt16(?) AS alt,
-                    toUInt8(?) AS batt,
-                    toUInt8(?) AS acc,
-                    toUInt8(?) AS vac,
-                    toString(?) AS conn,
-                    toString(?) AS locality,
-                    toString(?) AS ghash,
-                    toFloat64(?) AS p,
-                    toString(?) AS addr
-                """,
+    INSERT INTO country_days_tracker_bot.country_days_tracker
+    (date_time, user_id, latitude, longitude, country, tzname, alt, batt, acc, vac, conn, locality, ghash, p, addr)
+    SELECT 
+        toDateTime(?) AS date_time,
+        toInt64(?) AS user_id,
+        toFloat32(?) AS latitude,
+        toFloat32(?) AS longitude,
+        toString(?) AS country,
+        toString(?) AS tzname,
+        toUInt16(?) AS alt,
+        toUInt8(?) AS batt,
+        toUInt8(?) AS acc,
+        toUInt8(?) AS vac,
+        toString(?) AS conn,
+        toString(?) AS locality,
+        toString(?) AS ghash,
+        toFloat64(?) AS p,
+        toString(?) AS addr
+    """,
                     ZonedDateTime.now().withZoneSameInstant(ts).toLocalDateTime(),
                     userId,
                     latitude,
@@ -77,6 +79,7 @@ class DatabaseService {
                     p,
                     addr
                 )
+
             )
         }
     }
@@ -98,10 +101,10 @@ class DatabaseService {
                     """,
                     mapOf("user_id" to userId),
                 )
-                .map { row ->
-                    Pair(row.string("country"), row.int("count_of_days"))
-                }
-                .asList
+                    .map { row ->
+                        Pair(row.string("country"), row.int("count_of_days"))
+                    }
+                    .asList
             )
     }
 
@@ -160,20 +163,21 @@ class DatabaseService {
                         "country_name" to countryName
                     )
                 )
-                .map { row ->
-                    Triple(
-                        row.string("country"),
-                        Pair(row.localDate("start_day"), row.localDate("end_day")),
-                        row.int("days_in_country")
-                    )
-                }
-                .asList
+                    .map { row ->
+                        Triple(
+                            row.string("country"),
+                            Pair(row.localDate("start_day"), row.localDate("end_day")),
+                            row.int("days_in_country")
+                        )
+                    }
+                    .asList
             )
     }
 
     fun getCurrentCountryLength(): Pair<String, Int> {
         return sessionOf(dataSource)
-            .run(queryOf(
+            .run(
+                queryOf(
                 """
                 WITH
                 -- Remove time, keep only date
@@ -220,6 +224,7 @@ class DatabaseService {
                      )
                 WHERE rn = 1 
                 """, mapOf()
-            ).map { row -> Pair(row.string("country"), row.int("days_in_country")) }.asSingle)!!
+            ).map { row -> Pair(row.string("country"), row.int("days_in_country")) }.asSingle
+            )!!
     }
 }
