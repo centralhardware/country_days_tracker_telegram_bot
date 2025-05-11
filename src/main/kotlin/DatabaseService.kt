@@ -74,8 +74,8 @@ class DatabaseService {
                       :conn,
                       :locality,
                       :ghash,
-                      :p,
-                      :addr)
+                      :p::Float64,
+                      :addr::String)
                     """,
                     mapOf(
                         "date_time" to ZonedDateTime.now().withZoneSameInstant(ts).toLocalDateTime(),
