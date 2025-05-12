@@ -1,30 +1,46 @@
-
 import dev.inmo.kslog.common.KSLog
 import dev.inmo.kslog.common.info
 import io.ktor.http.*
+import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
+import io.ktor.server.plugins.contentnegotiation.*
+import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import kotlinx.serialization.Serializable
 import java.time.ZoneId
 import java.util.*
 
-/**
- * Service responsible for handling web requests related to location tracking.
- */
+@Serializable
+data class LocationRequest(
+    val latitude: Float,
+    val longitude: Float,
+    val timezone: String,
+    val country: String,
+    val alt: Int,
+    val batt: Int,
+    val acc: Int,
+    val vac: Int,
+    val conn: String,
+    val locality: String,
+    val ghash: String,
+    val p: Double,
+    val addr: String,
+    val userId: Long
+)
+
 class WebService(private val databaseService: DatabaseService) {
 
-    /**
-     * Starts the web server on the specified port.
-     * 
-     * @param port The port to run the server on
-     * @return The EmbeddedServer instance
-     */
     fun start(port: Int = 80): EmbeddedServer<NettyApplicationEngine, NettyApplicationEngine.Configuration> {
         KSLog.info("Starting web service on port $port")
 
         return embeddedServer(Netty, port = port) {
+            install(ContentNegotiation) {
+                json()
+            }
+
             routing {
                 post("/location") {
                     handleLocationUpdate(call)
@@ -33,49 +49,28 @@ class WebService(private val databaseService: DatabaseService) {
         }.start(wait = false)
     }
 
-    /**
-     * Handles location update requests.
-     * 
-     * @param call The ApplicationCall containing the request
-     */
     private suspend fun handleLocationUpdate(call: ApplicationCall) {
         try {
-            val latitude = call.request.queryParameters["latitude"]!!.toFloat()
-            val longitude = call.request.queryParameters["longitude"]!!.toFloat()
-            val timezone = call.request.queryParameters["timezone"]!!
-            val country = call.request.queryParameters["country"]!!
+            val body = call.receive<LocationRequest>()
 
-            // Additional parameters
-            val alt = call.request.queryParameters["alt"]!!.toInt()
-            val batt = call.request.queryParameters["batt"]!!.toInt()
-            val acc = call.request.queryParameters["acc"]!!.toInt()
-            val vac = call.request.queryParameters["vac"]!!.toInt()
-            val conn = call.request.queryParameters["conn"]!!
-            val locality = call.request.queryParameters["locality"]!!
-            val ghash = call.request.queryParameters["ghash"]!!
-            val p = call.request.queryParameters["p"]!!.toDouble()
-            val addr = call.request.queryParameters["addr"]!!
+            KSLog.info("Processing location update: $body")
 
-
-            KSLog.info("Processing location update: lat=$latitude, lon=$longitude, country=$country," +
-                    "alt=$alt, batt=$batt, acc=$acc, vac=$vac, conn=$conn, locality=$locality, ghash=$ghash, p=$p, addr=$addr")
-
-            runCatching { 
+            runCatching {
                 databaseService.save(
-                    latitude, 
-                    longitude, 
-                    toTimeZone(timezone), 
-                    toCountry(country), 
-                    alt,
-                    batt,
-                    acc,
-                    vac,
-                    conn,
-                    locality,
-                    ghash,
-                    p,
-                    addr
-                ) 
+                    body.latitude,
+                    body.longitude,
+                    toTimeZone(body.timezone),
+                    toCountry(body.country),
+                    body.alt,
+                    body.batt,
+                    body.acc,
+                    body.vac,
+                    body.conn,
+                    body.locality,
+                    body.ghash,
+                    body.p,
+                    body.addr
+                )
             }.onSuccess {
                 KSLog.info("Successfully saved location update")
                 call.respond(HttpStatusCode.OK)
@@ -95,13 +90,7 @@ class WebService(private val databaseService: DatabaseService) {
         }
     }
 
-    /**
-     * Converts a timezone string to a ZoneId.
-     */
     private fun toTimeZone(ts: String): ZoneId = TimeZone.getTimeZone(ts).toZoneId()
 
-    /**
-     * Converts a country code to a country name.
-     */
     private fun toCountry(cc: String): String = Locale.of("en", cc).displayCountry
 }

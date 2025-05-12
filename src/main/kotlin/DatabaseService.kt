@@ -33,12 +33,6 @@ class DatabaseService {
         p: Double,
         addr: String
     ) {
-        KSLog.info(
-            "lat: $latitude, lon: $longitude, ts: $ts, cc: $country, " +
-                    "alt: $alt, batt: $batt, acc: $acc, vac: $vac, conn: $conn, " +
-                    "locality: $locality, ghash: $ghash, p: $p, addr: $addr"
-        )
-
         sessionOf(dataSource).use { session ->
             session.execute(
                 queryOf(
