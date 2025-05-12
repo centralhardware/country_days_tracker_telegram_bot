@@ -34,7 +34,7 @@ suspend fun main() {
                 val i = AtomicInteger(1)
 
                 Trace.save("checkStat", mapOf("chatId" to it.from!!.id.chatId.long.toString()))
-                val stat = dbService.getCountryStats(it.chat.id.chatId.long)
+                val stat = dbService.getCountryStats()
                 val msg = buildString {
                     append(stat.joinToString("\n") { "${i.getAndIncrement()} - ${it.first} - ${it.second}(${prettyTime(it.second)})" })
                     append("\n\n")
@@ -54,7 +54,7 @@ suspend fun main() {
                     val countryName = args.first()
 
                     // Get trip date ranges for the specified country
-                    val trips = dbService.getTrips(it.chat.id.chatId.long, countryName)
+                    val trips = dbService.getTrips(countryName)
 
                     if (trips.isEmpty()) {
                         reply(it, "No trips to country '$countryName' found.")
