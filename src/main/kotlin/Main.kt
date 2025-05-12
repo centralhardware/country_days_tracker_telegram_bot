@@ -97,8 +97,8 @@ fun prettyTime(totalDays: Int): String {
     val months = (remainingDaysAfterYears / 30.44).toInt()
     val remainingDaysAfterMonths = (remainingDaysAfterYears % 30.44).toInt()
 
-    val weeks = (remainingDaysAfterMonths / 7).toInt()
-    val days = (remainingDaysAfterMonths % 7).toInt()
+    val weeks = (remainingDaysAfterMonths / 7)
+    val days = (remainingDaysAfterMonths % 7)
 
     val parts = mutableListOf<String>()
 

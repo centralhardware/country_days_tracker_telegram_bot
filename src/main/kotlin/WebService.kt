@@ -40,37 +40,24 @@ class WebService(private val databaseService: DatabaseService) {
      */
     private suspend fun handleLocationUpdate(call: ApplicationCall) {
         try {
-            val latitude = call.request.queryParameters["latitude"]?.toFloatOrNull()
-            val longitude = call.request.queryParameters["longitude"]?.toFloatOrNull()
-            val timezone = call.request.queryParameters["timezone"]
-            val country = call.request.queryParameters["country"]
-            val userId = call.request.queryParameters["userId"]?.toLongOrNull()
+            val latitude = call.request.queryParameters["latitude"]!!.toFloat()
+            val longitude = call.request.queryParameters["longitude"]!!.toFloat()
+            val timezone = call.request.queryParameters["timezone"]!!
+            val country = call.request.queryParameters["country"]!!
 
             // Additional parameters
-            val alt = call.request.queryParameters["alt"]?.toIntOrNull()
-            val batt = call.request.queryParameters["batt"]?.toIntOrNull()
-            val acc = call.request.queryParameters["acc"]?.toIntOrNull()
-            val vac = call.request.queryParameters["vac"]?.toIntOrNull()
-            val conn = call.request.queryParameters["conn"]
-            val locality = call.request.queryParameters["locality"]
-            val ghash = call.request.queryParameters["ghash"]
-            val p = call.request.queryParameters["p"]?.toDoubleOrNull()
-            val addr = call.request.queryParameters["addr"]
+            val alt = call.request.queryParameters["alt"]!!.toInt()
+            val batt = call.request.queryParameters["batt"]!!.toInt()
+            val acc = call.request.queryParameters["acc"]!!.toInt()
+            val vac = call.request.queryParameters["vac"]!!.toInt()
+            val conn = call.request.queryParameters["conn"]!!
+            val locality = call.request.queryParameters["locality"]!!
+            val ghash = call.request.queryParameters["ghash"]!!
+            val p = call.request.queryParameters["p"]!!.toDouble()
+            val addr = call.request.queryParameters["addr"]!!
 
-            if (latitude == null || longitude == null || timezone == null || 
-                country == null || userId == null || alt == null || batt == null || 
-                acc == null || vac == null || conn == null || locality == null || 
-                ghash == null || p == null || addr == null) {
 
-                KSLog.info("Received invalid location update request: missing or invalid parameters")
-                call.respond(
-                    HttpStatusCode.BadRequest,
-                    "Missing or invalid query parameters"
-                )
-                return
-            }
-
-            KSLog.info("Processing location update: lat=$latitude, lon=$longitude, country=$country, userId=$userId, " +
+            KSLog.info("Processing location update: lat=$latitude, lon=$longitude, country=$country," +
                     "alt=$alt, batt=$batt, acc=$acc, vac=$vac, conn=$conn, locality=$locality, ghash=$ghash, p=$p, addr=$addr")
 
             runCatching { 
@@ -79,7 +66,6 @@ class WebService(private val databaseService: DatabaseService) {
                     longitude, 
                     toTimeZone(timezone), 
                     toCountry(country), 
-                    userId,
                     alt,
                     batt,
                     acc,

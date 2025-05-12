@@ -23,7 +23,6 @@ class DatabaseService {
         longitude: Float,
         ts: ZoneId,
         country: String,
-        userId: Long,
         alt: Int,
         batt: Int,
         acc: Int,
@@ -45,10 +44,9 @@ class DatabaseService {
                 queryOf(
                     """
     INSERT INTO country_days_tracker_bot.country_days_tracker
-    (date_time, user_id, latitude, longitude, country, tzname, alt, batt, acc, vac, conn, locality, ghash, p, addr)
+    (date_time, latitude, longitude, country, tzname, alt, batt, acc, vac, conn, locality, ghash, p, addr)
     SELECT 
         toDateTime(?) AS date_time,
-        toInt64(?) AS user_id,
         toFloat32(?) AS latitude,
         toFloat32(?) AS longitude,
         toString(?) AS country,
@@ -64,7 +62,6 @@ class DatabaseService {
         toString(?) AS addr
     """,
                     ZonedDateTime.now().withZoneSameInstant(ts).toLocalDateTime(),
-                    userId,
                     latitude,
                     longitude,
                     country,
@@ -85,7 +82,7 @@ class DatabaseService {
     }
 
 
-    fun getCountryStats(userId: Long): List<Pair<String, Int>> {
+    fun getCountryStats(): List<Pair<String, Int>> {
         return sessionOf(dataSource)
             .run(
                 queryOf(
@@ -94,12 +91,11 @@ class DatabaseService {
                     FROM (
                       SELECT DISTINCT lower(country) as country,toStartOfDay(date_time)
                       FROM country_days_tracker_bot.country_days_tracker
-                      WHERE user_id = :user_id
                     )
                     GROUP BY country
                     ORDER BY count(*) DESC
                     """,
-                    mapOf("user_id" to userId),
+                    mapOf(),
                 )
                     .map { row ->
                         Pair(row.string("country"), row.int("count_of_days"))
@@ -108,7 +104,7 @@ class DatabaseService {
             )
     }
 
-    fun getTrips(userId: Long, countryName: String): List<Triple<String, Pair<LocalDate, LocalDate>, Int>> {
+    fun getTrips(countryName: String): List<Triple<String, Pair<LocalDate, LocalDate>, Int>> {
         return sessionOf(dataSource)
             .run(
                 queryOf(
@@ -159,7 +155,6 @@ class DatabaseService {
                     ORDER BY start_day DESC
                     """,
                     mapOf(
-                        "user_id" to userId,
                         "country_name" to countryName
                     )
                 )
