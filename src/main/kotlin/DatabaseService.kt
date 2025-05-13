@@ -169,49 +169,42 @@ class DatabaseService {
                 queryOf(
                 """
                 WITH
-                -- Remove time, keep only date
-                data AS (
-                    SELECT
-                        user_id,
-                        toDate(date_time) AS day,
-                        country
-                    FROM country_days_tracker_bot.country_days_tracker
-                    GROUP BY
-                        user_id, day, country
-                ),
+data AS (
+        SELECT
+            toDate(date_time) AS day,
+            country
+        FROM country_days_tracker_bot.country_days_tracker
+        GROUP BY day, country
+    ),
 
-                -- Define session boundaries by country change
-                with_sessions AS (
-                    SELECT
-                        *,
-                        row_number() OVER (PARTITION BY user_id ORDER BY day) -
-                        row_number() OVER (PARTITION BY user_id, country ORDER BY day) AS session_id
-                    FROM data
-                ),
+    with_sessions AS (
+        SELECT
+            *,
+            row_number() OVER (ORDER BY day) -
+            row_number() OVER (PARTITION BY country ORDER BY day) AS session_id
+        FROM data
+    ),
 
-                -- Group by sessions, count duration
-                sessions_grouped AS (
-                    SELECT
-                        user_id,
-                        country,
-                        min(day) AS start_day,
-                        max(day) AS end_day,
-                        count() AS days_in_country
-                    FROM with_sessions
-                    GROUP BY
-                        user_id, country, session_id
-                )
+    sessions_grouped AS (
+        SELECT
+            country,
+            min(day) AS start_day,
+            max(day) AS end_day,
+            count() AS days_in_country
+        FROM with_sessions
+        GROUP BY country, session_id
+    )
 
-                -- Output only the current session (maximum by date)
-                SELECT
-                    country,
-                    days_in_country
-                FROM (
-                     SELECT *,
-                            row_number() OVER (PARTITION BY user_id ORDER BY end_day DESC) AS rn
-                     FROM sessions_grouped
-                     )
-                WHERE rn = 1 
+SELECT
+    country,
+    days_in_country
+FROM (
+    SELECT *,
+           row_number() OVER (ORDER BY end_day DESC) AS rn
+    FROM sessions_grouped
+)
+WHERE rn = 1
+ 
                 """, mapOf()
             ).map { row -> Pair(row.string("country"), row.int("days_in_country")) }.asSingle
             )!!
