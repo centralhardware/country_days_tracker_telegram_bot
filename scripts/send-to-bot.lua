@@ -34,19 +34,17 @@ function otr_hook(topic, _type, data)
 	otr.log("Payload: " .. json)
 
 	local url = "http://10.168.0.77:7890/location"
-	local cmd = 'curl -X POST -s -v "' .. url .. '" -H "Content-Type: application/json" -d \'' .. json .. '\' 2>&1'
+	local cmd = 'curl -X POST -s "' .. url .. '" -H "Content-Type: application/json" -d \'' .. json .. '\' 2>&1'
 	otr.log("Executing command: " .. cmd)
 
 	local handle = io.popen(cmd)
-	local result = handle:read("*a")
+	handle:read("*a")
 	local success, exit_code = handle:close()
 
 	if success then
 		otr.log("Curl command executed successfully")
-		otr.log("Response: " .. result)
 	else
 		otr.log("Curl command failed with exit code: " .. (exit_code or "unknown"))
-		otr.log("Response: " .. result)
 	end
 end
 
