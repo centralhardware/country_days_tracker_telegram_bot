@@ -14,7 +14,6 @@ function otr_hook(topic, _type, data)
 		return str
 	end
 
-	-- Сформировать JSON вручную
 	local json = '{' ..
 			'"latitude":"'  .. escape_json(data['lat']) .. '",' ..
 			'"longitude":"' .. escape_json(data['lon']) .. '",' ..
@@ -28,8 +27,7 @@ function otr_hook(topic, _type, data)
 			'"locality":"'  .. escape_json(data['locality']) .. '",' ..
 			'"ghash":"'     .. escape_json(data['ghash']) .. '",' ..
 			'"p":"'         .. escape_json(data['p']) .. '",' ..
-			'"addr":"'      .. escape_json(data['addr']) .. '",' ..
-			'"userId":428985392' ..
+			'"addr":"'      .. escape_json(data['addr']) .. '"' ..
 			'}'
 
 	otr.log("Sending data as JSON:")

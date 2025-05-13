@@ -27,8 +27,7 @@ data class LocationRequest(
     val locality: String,
     val ghash: String,
     val p: Double,
-    val addr: String,
-    val userId: Long
+    val addr: String
 )
 
 class WebService(private val databaseService: DatabaseService) {
