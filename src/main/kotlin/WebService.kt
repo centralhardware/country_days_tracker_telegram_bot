@@ -32,6 +32,10 @@ data class LocationRequest(
 
 class WebService(private val databaseService: DatabaseService) {
 
+    companion object {
+        private const val MAX_ACCURACY_THRESHOLD = 255
+    }
+
     fun start(port: Int = 80): EmbeddedServer<NettyApplicationEngine, NettyApplicationEngine.Configuration> {
         KSLog.info("Starting web service on port $port")
 
@@ -53,6 +57,16 @@ class WebService(private val databaseService: DatabaseService) {
             val body = call.receive<LocationRequest>()
 
             KSLog.info("Processing location update: $body")
+
+            // Check for accuracy
+            if (body.acc > MAX_ACCURACY_THRESHOLD) {
+                KSLog.info("Location update rejected due to low accuracy: ${body.acc}m (threshold: ${MAX_ACCURACY_THRESHOLD}m)")
+                call.respond(
+                    HttpStatusCode.BadRequest,
+                    "Location accuracy (${body.acc}m) is below the required threshold (${MAX_ACCURACY_THRESHOLD}m)."
+                )
+                return
+            }
 
             runCatching {
                 databaseService.save(
