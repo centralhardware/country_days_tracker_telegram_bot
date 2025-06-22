@@ -10,6 +10,7 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 import java.time.ZoneId
 import java.util.*
 
@@ -53,8 +54,9 @@ class WebService(private val databaseService: DatabaseService) {
     }
 
     private suspend fun handleLocationUpdate(call: ApplicationCall) {
+        val bodyString = call.receiveText()
         try {
-            val body = call.receive<LocationRequest>()
+            val body = Json.decodeFromString<LocationRequest>(bodyString)
 
             KSLog.info("Processing location update: $body")
 
@@ -88,14 +90,14 @@ class WebService(private val databaseService: DatabaseService) {
                 KSLog.info("Successfully saved location update")
                 call.respond(HttpStatusCode.OK)
             }.onFailure { error ->
-                KSLog.info("Failed to save location update: ${error.message}")
+                KSLog.info("Failed to save location update: ${error.message}. Body: $bodyString")
                 call.respond(
                     HttpStatusCode.InternalServerError,
                     "Failed to save location data: ${error.message}"
                 )
             }
         } catch (e: Exception) {
-            KSLog.info("Error processing location update: ${e.message}")
+            KSLog.info("Error processing location update: ${e.message}. Body: $bodyString")
             call.respond(
                 HttpStatusCode.InternalServerError,
                 "An unexpected error occurred: ${e.message}"
