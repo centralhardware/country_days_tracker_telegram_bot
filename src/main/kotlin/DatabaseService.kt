@@ -5,8 +5,8 @@ import kotliquery.queryOf
 import kotliquery.sessionOf
 import java.sql.SQLException
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.ZoneId
-import java.time.ZonedDateTime
 import javax.sql.DataSource
 
 class DatabaseService {
@@ -19,6 +19,7 @@ class DatabaseService {
     }
 
     fun save(
+        dateTime: LocalDateTime,
         latitude: Float,
         longitude: Float,
         ts: ZoneId,
@@ -55,7 +56,7 @@ class DatabaseService {
         toFloat64(?) AS p,
         toString(?) AS addr
     """,
-                    ZonedDateTime.now().withZoneSameInstant(ts).toLocalDateTime(),
+                    dateTime,
                     latitude,
                     longitude,
                     country,

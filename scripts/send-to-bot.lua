@@ -15,18 +15,19 @@ function otr_hook(topic, _type, data)
 	end
 
         local json = '{' ..
-                        '"latitude":"'  .. escape_json(data['lat']) .. '",' ..
-                        '"longitude":"' .. escape_json(data['lon']) .. '",' ..
+                        '"latitude":'  .. escape_json(data['lat']) .. ',' ..
+                        '"longitude":' .. escape_json(data['lon']) .. ',' ..
+                        '"timestamp":' .. escape_json(data['tst']) .. ',' ..
                         '"timezone":"'  .. escape_json(data['tzname']) .. '",' ..
                         '"country":"'   .. escape_json(data['cc']) .. '",' ..
-                        '"alt":"'       .. escape_json(data['alt']) .. '",' ..
-                        '"batt":"'      .. escape_json(data['batt']) .. '",' ..
-                        '"acc":"'       .. escape_json(data['acc']) .. '",' ..
-                        '"vac":"'       .. escape_json(data['vac']) .. '",' ..
+                        '"alt":'       .. escape_json(data['alt']) .. ',' ..
+                        '"batt":'      .. escape_json(data['batt']) .. ',' ..
+                        '"acc":'       .. escape_json(data['acc']) .. ',' ..
+                        '"vac":'       .. escape_json(data['vac']) .. ',' ..
                         '"conn":"'      .. escape_json(data['conn']) .. '",' ..
                         '"locality":"'  .. escape_json(data['locality']) .. '",' ..
                         '"ghash":"'     .. escape_json(data['ghash']) .. '",' ..
-                        '"p":"'         .. escape_json(data['p']) .. '",' ..
+                        '"p":'         .. escape_json(data['p']) .. ',' ..
                         '"addr":"'      .. escape_json(data['addr']) .. '"' ..
                         '}'
 

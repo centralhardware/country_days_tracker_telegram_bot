@@ -12,6 +12,7 @@ import io.ktor.server.routing.*
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import java.time.ZoneId
+import java.time.Instant
 import java.util.*
 
 @Serializable
@@ -20,6 +21,7 @@ data class LocationRequest(
     val longitude: Float,
     val timezone: String,
     val country: String,
+    val timestamp: Long,
     val alt: Int,
     val batt: Int,
     val acc: Int,
@@ -72,6 +74,9 @@ class WebService(private val databaseService: DatabaseService) {
 
             runCatching {
                 databaseService.save(
+                    Instant.ofEpochSecond(body.timestamp)
+                        .atZone(toTimeZone(body.timezone))
+                        .toLocalDateTime(),
                     body.latitude,
                     body.longitude,
                     toTimeZone(body.timezone),
