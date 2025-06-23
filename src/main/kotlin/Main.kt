@@ -24,8 +24,7 @@ suspend fun main() {
     webService.start(80)
     longPolling({ restrictAccess(EnvironmentVariableUserAccessChecker()) }) {
             setMyCommands(
-                BotCommand("stat", "show statistics"),
-                BotCommand("trips", "show date ranges of trips to a specified country")
+                BotCommand("stat", "show statistics")
             )
             onCommand("stat") {
                 val i = AtomicInteger(1)
