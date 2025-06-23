@@ -2,19 +2,16 @@ import com.clickhouse.jdbc.DataSourceImpl
 import kotliquery.queryOf
 import kotliquery.sessionOf
 import java.sql.SQLException
-import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.util.Properties
 import javax.sql.DataSource
 
 class DatabaseService {
-    companion object {
-        val dataSource: DataSource = try {
-            DataSourceImpl(System.getenv("CLICKHOUSE_URL"), Properties())
-        } catch (e: SQLException) {
-            throw RuntimeException(e)
-        }
+    val dataSource: DataSource = try {
+        DataSourceImpl(System.getenv("CLICKHOUSE_URL"), Properties())
+    } catch (e: SQLException) {
+        throw RuntimeException(e)
     }
 
     fun save(
@@ -109,65 +106,6 @@ class DatabaseService {
                 )
                     .map { row ->
                         Pair(row.string("country"), row.int("count_of_days"))
-                    }
-                    .asList
-            )
-    }
-
-    fun getTrips(countryName: String): List<Triple<String, Pair<LocalDate, LocalDate>, Int>> {
-        return sessionOf(dataSource)
-            .run(
-                queryOf(
-                    // language=SQL
-                    """
-                        WITH
-                            data AS (
-                                SELECT
-                                    user_id,
-                                    toDate(date_time) AS day,
-                                    country
-                                FROM country_days_tracker_bot.country_days_tracker
-                                WHERE user_id = :user_id
-                                  AND LOWER(country) = LOWER(:country_name)
-                                GROUP BY user_id, day, country
-                            ),
-                            with_sessions AS (
-                                SELECT
-                                    *,
-                                    day - toIntervalDay(
-                                        row_number() OVER (PARTITION BY user_id, country ORDER BY day)
-                                    ) AS session_id
-                                FROM data
-                            ),
-                            sessions_grouped AS (
-                                SELECT
-                                    user_id,
-                                    country,
-                                    MIN(day) AS start_day,
-                                    MAX(day) AS end_day,
-                                    COUNT() AS days_in_country
-                                FROM with_sessions
-                                GROUP BY user_id, country, session_id
-                            )
-                        SELECT
-                            country,
-                            start_day,
-                            end_day,
-                            days_in_country
-                        FROM sessions_grouped
-                        WHERE user_id = :user_id
-                        ORDER BY start_day DESC
-                    """.trimIndent(),
-                    mapOf(
-                        "country_name" to countryName
-                    )
-                )
-                    .map { row ->
-                        Triple(
-                            row.string("country"),
-                            Pair(row.localDate("start_day"), row.localDate("end_day")),
-                            row.int("days_in_country")
-                        )
                     }
                     .asList
             )

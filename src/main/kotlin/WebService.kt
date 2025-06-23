@@ -57,7 +57,7 @@ class WebService(private val databaseService: DatabaseService) {
 
     private suspend fun handleLocationUpdate(call: ApplicationCall) {
         val bodyString = call.receiveText()
-        try {
+        runCatching {
             val body = Json.decodeFromString<LocationRequest>(bodyString)
 
             KSLog.info("Processing location update: $body")
@@ -72,45 +72,37 @@ class WebService(private val databaseService: DatabaseService) {
                 return
             }
 
-            runCatching {
-                databaseService.save(
-                    Instant.ofEpochSecond(body.timestamp)
-                        .atZone(toTimeZone(body.timezone))
-                        .toLocalDateTime(),
-                    body.latitude,
-                    body.longitude,
-                    toTimeZone(body.timezone),
-                    toCountry(body.country),
-                    body.alt,
-                    body.batt,
-                    body.acc,
-                    body.vac,
-                    body.conn,
-                    body.locality,
-                    body.ghash,
-                    body.p,
-                    body.addr
-                )
-            }.onSuccess {
-                KSLog.info("Successfully saved location update")
-                call.respond(HttpStatusCode.OK)
-            }.onFailure { error ->
-                KSLog.info("Failed to save location update: ${error.message}. Body: $bodyString")
-                call.respond(
-                    HttpStatusCode.InternalServerError,
-                    "Failed to save location data: ${error.message}"
-                )
-            }
-        } catch (e: Exception) {
-            KSLog.info("Error processing location update: ${e.message}. Body: $bodyString")
+            databaseService.save(
+                Instant.ofEpochSecond(body.timestamp)
+                    .atZone(body.timezone.toTimeZone())
+                    .toLocalDateTime(),
+                body.latitude,
+                body.longitude,
+                body.timezone.toTimeZone(),
+                body.country.toCountry(),
+                body.alt,
+                body.batt,
+                body.acc,
+                body.vac,
+                body.conn,
+                body.locality,
+                body.ghash,
+                body.p,
+                body.addr
+            )
+        }.onSuccess {
+            KSLog.info("Successfully saved location update")
+            call.respond(HttpStatusCode.OK)
+        }.onFailure { error ->
+            KSLog.info("Failed to save location update: ${error.message}. Body: $bodyString")
             call.respond(
                 HttpStatusCode.InternalServerError,
-                "An unexpected error occurred: ${e.message}"
+                "Failed to save location data: ${error.message}"
             )
         }
     }
 
-    private fun toTimeZone(ts: String): ZoneId = TimeZone.getTimeZone(ts).toZoneId()
+    private fun String.toTimeZone() = TimeZone.getTimeZone(this).toZoneId()
 
-    private fun toCountry(cc: String): String = Locale.of("en", cc).displayCountry
+    private fun String.toCountry() = Locale.of("en", this).displayCountry
 }

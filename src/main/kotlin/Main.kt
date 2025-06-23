@@ -7,23 +7,20 @@ import dev.inmo.tgbotapi.Trace
 import dev.inmo.tgbotapi.extensions.api.bot.setMyCommands
 import dev.inmo.tgbotapi.extensions.api.send.reply
 import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onCommand
-import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onCommandWithArgs
 import dev.inmo.tgbotapi.extensions.utils.extensions.raw.from
 import dev.inmo.tgbotapi.longPolling
 import dev.inmo.tgbotapi.types.BotCommand
 import dev.inmo.tgbotapi.utils.RiskFeature
-import me.centralhardware.telegram.EnvironmentVariableUserAccessChecker
-import me.centralhardware.telegram.restrictAccess
+import me.centralhardware.telegram.ktgbotapi.access.checker.EnvironmentVariableUserAccessChecker
+import me.centralhardware.telegram.ktgbotapi.access.middleware.restrictAccess
 import java.util.concurrent.atomic.AtomicInteger
 
-// Service instances
 private val dbService = DatabaseService()
 private val webService = WebService(dbService)
 
 @OptIn(Warning::class, RiskFeature::class)
 suspend fun main() {
     AppConfig.init("CountryDaysTrackerBot")
-    // Start the web service
     webService.start(80)
     longPolling({ restrictAccess(EnvironmentVariableUserAccessChecker()) }) {
             setMyCommands(
@@ -45,38 +42,6 @@ suspend fun main() {
 
                 KSLog.info(stat)
                 reply(it, msg)
-            }
-
-            onCommandWithArgs("trips") { it, args ->
-                val commandText = it.content.text
-
-                if (args.isNotEmpty()) {
-                    val countryName = args.first()
-
-                    // Get trip date ranges for the specified country
-                    val trips = dbService.getTrips(countryName)
-
-                    if (trips.isEmpty()) {
-                        reply(it, "No trips to country '$countryName' found.")
-                    } else {
-                        // Find the longest stay
-                        val longestStay = trips.maxByOrNull { it.third } ?: trips.first()
-                        val longestStayDays = longestStay.third
-
-                        val msg = buildString {
-                            append("Trips to ${trips.first().first}:\n\n")
-                            append("Longest stay: ${longestStayDays} ${getDaysWord(longestStayDays)}\n\n")
-                            trips.forEachIndexed { index, trip ->
-                                val (_, dateRange, days) = trip
-                                val (startDate, endDate) = dateRange
-                                append("${index + 1}. ${startDate} - ${endDate} (${days} ${getDaysWord(days)})\n")
-                            }
-                        }
-                        reply(it, msg)
-                    }
-                } else {
-                    reply(it, "Please use the format: /trips /t <country name>")
-                }
             }
         }
         .second
@@ -110,8 +75,4 @@ fun prettyTime(totalDays: Int): String {
     }
 
     return parts.joinToString(", ").ifEmpty { "" }
-}
-
-fun getDaysWord(days: Int): String {
-    return if (days == 1) "day" else "days"
 }
