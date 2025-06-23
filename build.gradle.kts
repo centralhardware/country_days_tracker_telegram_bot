@@ -24,8 +24,8 @@ val clickhouseVersion = "0.9.0"
 
 dependencies {
     implementation("dev.inmo:tgbotapi:26.0.0")
-    implementation("com.github.centralhardware:ktgbotapi-commons:6ef1dde4fe")
-    implementation("com.github.centralhardware:ktgbotapi-restrict-access-middleware:33a3f2e3d4")
+    implementation("com.github.centralhardware:ktgbotapi-commons:ef9a97ef58")
+    implementation("com.github.centralhardware:ktgbotapi-restrict-access-middleware:7735f88354")
     implementation("com.clickhouse:clickhouse-jdbc:$clickhouseVersion")
     implementation("com.clickhouse:clickhouse-http-client:$clickhouseVersion")
     implementation("org.lz4:lz4-java:1.8.0")
@@ -34,7 +34,6 @@ dependencies {
     implementation("io.ktor:ktor-server-core:$ktorVersion")
     implementation("io.ktor:ktor-server-content-negotiation:$ktorVersion")
     implementation("io.ktor:ktor-serialization-kotlinx-json:${ktorVersion}")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.1")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.1")
 }
 

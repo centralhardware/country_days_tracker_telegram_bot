@@ -1,18 +1,17 @@
-import com.clickhouse.jdbc.ClickHouseDataSource
-import dev.inmo.kslog.common.KSLog
-import dev.inmo.kslog.common.info
+import com.clickhouse.jdbc.DataSourceImpl
 import kotliquery.queryOf
 import kotliquery.sessionOf
 import java.sql.SQLException
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
+import java.util.Properties
 import javax.sql.DataSource
 
 class DatabaseService {
     companion object {
         val dataSource: DataSource = try {
-            ClickHouseDataSource(System.getenv("CLICKHOUSE_URL"))
+            DataSourceImpl(System.getenv("CLICKHOUSE_URL"), Properties())
         } catch (e: SQLException) {
             throw RuntimeException(e)
         }
