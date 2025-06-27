@@ -4,8 +4,8 @@ end
 function otr_hook(topic, _type, data)
         -- Log all keys available in the data table
         if data ~= nil then
-                for key, _ in pairs(data) do
-                        otr.log("data key: " .. tostring(key))
+                for key, value in pairs(data) do
+                        otr.log("data key: " .. tostring(key) .. ", value: " .. tostring(value))
                 end
         else
                 otr.log("data is nil")
