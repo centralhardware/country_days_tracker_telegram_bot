@@ -28,7 +28,10 @@ class DatabaseService {
         locality: String,
         ghash: String,
         p: Double,
-        addr: String
+        addr: String,
+        bssid: String?,
+        ssid: String?,
+        bs: Int?
     ) {
         sessionOf(dataSource).use { session ->
             session.execute(
@@ -49,7 +52,10 @@ class DatabaseService {
                             locality,
                             ghash,
                             p,
-                            addr
+                            addr,
+                            bssid,
+                            ssid,
+                            bs
                         )
                         SELECT
                             toDateTime(?) AS date_time,
@@ -65,7 +71,10 @@ class DatabaseService {
                             toString(?) AS locality,
                             toString(?) AS ghash,
                             toFloat64(?) AS p,
-                            toString(?) AS addr
+                            toString(?) AS addr,
+                            toString(?) AS bssid,
+                            toString(?) AS ssid,
+                            toUInt32(?) AS bs
                     """.trimIndent(),
                     dateTime,
                     latitude,
@@ -80,7 +89,10 @@ class DatabaseService {
                     locality,
                     ghash,
                     p,
-                    addr
+                    addr,
+                    bssid,
+                    ssid,
+                    bs
                 )
 
             )
