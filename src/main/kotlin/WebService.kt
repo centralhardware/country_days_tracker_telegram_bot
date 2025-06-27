@@ -30,7 +30,10 @@ data class LocationRequest(
     val locality: String,
     val ghash: String,
     val p: Double,
-    val addr: String
+    val addr: String,
+    val bssid: String? = null,
+    val ssid: String? = null,
+    val bs: Int? = null
 )
 
 class WebService(private val databaseService: DatabaseService) {
@@ -72,24 +75,27 @@ class WebService(private val databaseService: DatabaseService) {
                 return
             }
 
-            databaseService.save(
-                Instant.ofEpochSecond(body.timestamp)
-                    .atZone(body.timezone.toTimeZone())
-                    .toLocalDateTime(),
-                body.latitude,
-                body.longitude,
-                body.timezone.toTimeZone(),
-                body.country.toCountry(),
-                body.alt,
-                body.batt,
-                body.acc,
-                body.vac,
-                body.conn,
-                body.locality,
-                body.ghash,
-                body.p,
-                body.addr
-            )
+                databaseService.save(
+                    Instant.ofEpochSecond(body.timestamp)
+                        .atZone(body.timezone.toTimeZone())
+                        .toLocalDateTime(),
+                    body.latitude,
+                    body.longitude,
+                    body.timezone.toTimeZone(),
+                    body.country.toCountry(),
+                    body.alt,
+                    body.batt,
+                    body.acc,
+                    body.vac,
+                    body.conn,
+                    body.locality,
+                    body.ghash,
+                    body.p,
+                    body.addr,
+                    body.bssid,
+                    body.ssid,
+                    body.bs
+                )
         }.onSuccess {
             KSLog.info("Successfully saved location update")
             call.respond(HttpStatusCode.OK)

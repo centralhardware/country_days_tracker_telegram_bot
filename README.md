@@ -66,7 +66,10 @@ CREATE TABLE country_days_tracker_bot.country_days_tracker (
     locality String,
     ghash String,
     p Float64,
-    addr String
+    addr String,
+    bssid LowCardinality(Nullable(String)),
+    ssid LowCardinality(Nullable(String)),
+    bs Nullable(UInt32)
 ) ENGINE = MergeTree()
 ORDER BY (user_id, date_time);
 ```

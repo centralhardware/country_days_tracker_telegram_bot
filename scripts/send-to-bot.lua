@@ -43,7 +43,10 @@ function otr_hook(topic, _type, data)
                         '"locality":"'  .. escape_json(data['locality']) .. '",' ..
                         '"ghash":"'     .. escape_json(data['ghash']) .. '",' ..
                         '"p":'         .. escape_json_number(data['p']) .. ',' ..
-                        '"addr":"'      .. escape_json(data['addr']) .. '"' ..
+                        '"addr":"'      .. escape_json(data['addr']) .. '",' ..
+                        '"bssid":"'     .. escape_json(data['bssid']) .. '",' ..
+                        '"ssid":"'      .. escape_json(data['ssid']) .. '",' ..
+                        '"bs":'         .. escape_json_number(data['bs']) ..
                         '}'
 
         -- Escape single quotes so the JSON can be safely wrapped in single
