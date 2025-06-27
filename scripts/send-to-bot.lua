@@ -2,6 +2,15 @@ function otr_init()
 end
 
 function otr_hook(topic, _type, data)
+        -- Log all keys available in the data table
+        if data ~= nil then
+                for key, _ in pairs(data) do
+                        otr.log("data key: " .. tostring(key))
+                end
+        else
+                otr.log("data is nil")
+        end
+
         -- Escapes string values for JSON
         local function escape_json(str)
                 if str == nil then return "" end
