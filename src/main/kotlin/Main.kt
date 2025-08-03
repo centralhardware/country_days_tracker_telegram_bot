@@ -3,7 +3,6 @@ import dev.inmo.kslog.common.KSLog
 import dev.inmo.kslog.common.info
 import dev.inmo.micro_utils.common.Warning
 import dev.inmo.tgbotapi.AppConfig
-import dev.inmo.tgbotapi.Trace
 import dev.inmo.tgbotapi.extensions.api.bot.setMyCommands
 import dev.inmo.tgbotapi.extensions.api.send.reply
 import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onCommand
@@ -29,7 +28,6 @@ suspend fun main() {
             onCommand("stat") {
                 val i = AtomicInteger(1)
 
-                Trace.save("checkStat", mapOf("chatId" to it.from!!.id.chatId.long.toString()))
                 val stat = dbService.getCountryStats()
                 val msg = buildString {
                     append(stat.joinToString("\n") { "${i.getAndIncrement()} - ${it.first} - ${it.second}(${prettyTime(it.second)})" })
