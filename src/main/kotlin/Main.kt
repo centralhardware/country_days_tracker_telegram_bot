@@ -23,18 +23,34 @@ suspend fun main() {
     webService.start(80)
     longPolling({ restrictAccess(EnvironmentVariableUserAccessChecker()) }) {
             setMyCommands(
-                BotCommand("stat", "show statistics")
+                BotCommand("stat", "show statistics"),
+                BotCommand("citystat", "show city statistics")
             )
             onCommand("stat") {
                 val i = AtomicInteger(1)
 
                 val stat = dbService.getCountryStats()
                 val msg = buildString {
-                    append(stat.joinToString("\n") { "${i.getAndIncrement()} - ${it.first} - ${it.second}(${prettyTime(it.second)})" })
+                    append(
+                        stat.joinToString("\n") {
+                            "${i.getAndIncrement()} - ${it.first} - ${it.second}(${prettyTime(it.second)})"
+                        }
+                    )
                     append("\n\n")
                     append(calculateVisitedPercentage(stat.size) + "\n")
                     val currentCountry = dbService.getCurrentCountryLength()
                     append("Current country: ${currentCountry.first} ${currentCountry.second}")
+                }
+
+                KSLog.info(stat)
+                reply(it, msg)
+            }
+            onCommand("citystat") {
+                val i = AtomicInteger(1)
+
+                val stat = dbService.getCityStats()
+                val msg = stat.joinToString("\n") {
+                    "${i.getAndIncrement()} - ${it.first} - ${it.second}(${prettyTime(it.second)})"
                 }
 
                 KSLog.info(stat)

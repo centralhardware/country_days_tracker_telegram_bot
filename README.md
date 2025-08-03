@@ -7,6 +7,7 @@ A Telegram bot that tracks the countries you've visited and provides statistics 
 - Track countries visited based on location data
 - View statistics about your travels, including:
   - List of visited countries with days spent in each
+  - List of visited cities with days spent in each
   - Percentage of world countries visited
   - Current country and length of stay
 - Converts time spent in countries to a human-readable format (years, months, weeks, days)
