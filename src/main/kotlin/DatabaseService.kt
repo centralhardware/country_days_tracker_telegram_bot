@@ -123,6 +123,29 @@ class DatabaseService {
             )
     }
 
+    fun getCityStats(): List<Pair<String, Int>> {
+        return sessionOf(dataSource)
+            .run(
+                queryOf(
+                    // language=SQL
+                    """
+                        SELECT locality, COUNT(*) AS count_of_days
+                        FROM (
+                            SELECT DISTINCT LOWER(locality) AS locality, toStartOfDay(date_time)
+                            FROM country_days_tracker_bot.country_days_tracker
+                        )
+                        GROUP BY locality
+                        ORDER BY COUNT(*) DESC
+                    """.trimIndent(),
+                    mapOf(),
+                )
+                    .map { row ->
+                        Pair(row.string("locality"), row.int("count_of_days"))
+                    }
+                    .asList
+            )
+    }
+
     fun getCurrentCountryLength(): Pair<String, Int> {
         return sessionOf(dataSource)
             .run(
