@@ -134,6 +134,7 @@ class DatabaseService {
                             SELECT DISTINCT LOWER(locality) AS locality, toStartOfDay(date_time)
                             FROM country_days_tracker_bot.country_days_tracker
                         )
+                        WHERE locality != ''
                         GROUP BY locality
                         ORDER BY COUNT(*) DESC
                     """.trimIndent(),
