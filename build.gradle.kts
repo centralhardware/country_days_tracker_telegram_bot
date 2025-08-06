@@ -23,7 +23,7 @@ val ktorVersion = "3.2.3";
 val clickhouseVersion = "0.9.1"
 
 dependencies {
-    implementation("dev.inmo:tgbotapi:27.1.1")
+    implementation("dev.inmo:tgbotapi:27.1.2")
     implementation("com.github.centralhardware:ktgbotapi-commons:beafbfc9a8")
     implementation("com.github.centralhardware:ktgbotapi-restrict-access-middleware:3eb8ec3ecb")
     implementation("com.clickhouse:clickhouse-jdbc:$clickhouseVersion")
