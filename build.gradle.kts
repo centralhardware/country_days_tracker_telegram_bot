@@ -25,7 +25,7 @@ val clickhouseVersion = "0.9.1"
 
 dependencies {
     implementation("dev.inmo:tgbotapi:$ktgbotapiVersion")
-    implementation("com.github.centralhardware:ktgbotapi-commons:$ktgbotapiVersion")
+    implementation("com.github.centralhardware:ktgbotapi-commons:$ktgbotapiVersion-1")
     implementation("com.github.centralhardware:ktgbotapi-restrict-access-middleware:$ktgbotapiVersion")
     implementation("com.clickhouse:clickhouse-jdbc:$clickhouseVersion")
     implementation("com.clickhouse:clickhouse-http-client:$clickhouseVersion")
