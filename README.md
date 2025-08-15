@@ -14,7 +14,7 @@ A Telegram bot that tracks the countries you've visited and provides statistics 
 
 ## Requirements
 
-- Java 22
+- Java 24
 - ClickHouse database
 - Telegram Bot API token
 
