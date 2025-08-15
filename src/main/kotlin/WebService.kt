@@ -75,7 +75,7 @@ class WebService(private val databaseService: DatabaseService) {
                 return
             }
 
-                databaseService.save(
+            databaseService.save(
                     Instant.ofEpochSecond(body.timestamp)
                         .atZone(body.timezone.toTimeZone())
                         .toLocalDateTime(),
