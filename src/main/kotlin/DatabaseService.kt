@@ -110,6 +110,7 @@ class DatabaseService {
                         FROM (
                             SELECT DISTINCT LOWER(country) AS country, toStartOfDay(date_time)
                             FROM country_days_tracker_bot.country_days_tracker
+                            WHERE country != ''
                         )
                         GROUP BY country
                         ORDER BY COUNT(*) DESC
@@ -159,6 +160,7 @@ class DatabaseService {
                                     toDate(date_time) AS day,
                                     country
                                 FROM country_days_tracker_bot.country_days_tracker
+                                WHERE country != ''
                                 GROUP BY day, country
                             ),
                             with_sessions AS (
