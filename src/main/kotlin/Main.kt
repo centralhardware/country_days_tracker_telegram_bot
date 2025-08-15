@@ -33,7 +33,9 @@ suspend fun main() {
                 val msg = buildString {
                     append(
                         stat.joinToString("\n") {
-                            "${i.getAndIncrement()} - ${it.first} - ${it.second}(${prettyTime(it.second)})"
+                            val pretty = prettyTime(it.second)
+                            val period = if (pretty.isEmpty()) "" else "($pretty)"
+                            "${i.getAndIncrement()} - ${it.first} - ${it.second}$period"
                         }
                     )
                     append("\n\n")
@@ -50,7 +52,9 @@ suspend fun main() {
 
                 val stat = dbService.getCityStats()
                 val msg = stat.joinToString("\n") {
-                    "${i.getAndIncrement()} - ${it.first} - ${it.second}(${prettyTime(it.second)})"
+                    val pretty = prettyTime(it.second)
+                    val period = if (pretty.isEmpty()) "" else "($pretty)"
+                    "${i.getAndIncrement()} - ${it.first} - ${it.second}$period"
                 }
 
                 KSLog.info(stat)
