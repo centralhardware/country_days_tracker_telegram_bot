@@ -14,26 +14,6 @@ import kotlinx.serialization.json.Json
 import java.time.Instant
 import java.util.*
 
-@Serializable
-data class LocationRequest(
-    val latitude: Float,
-    val longitude: Float,
-    val timezone: String,
-    val country: String,
-    val timestamp: Long,
-    val alt: Int,
-    val batt: Int,
-    val acc: Int,
-    val vac: Int,
-    val conn: String,
-    val locality: String,
-    val ghash: String,
-    val p: Double,
-    val addr: String,
-    val bssid: String? = null,
-    val ssid: String? = null,
-    val bs: Int? = null
-)
 
 @Serializable
 data class OwnTracksLocation(
@@ -73,74 +53,17 @@ class WebService(private val databaseService: DatabaseService) {
             }
 
             routing {
-                // Previous endpoint kept for backward compatibility (OwnTracks Recorder script)
-                post("/location") {
-                    handleLocationUpdate(call)
-                }
-                // New endpoints to accept OwnTracks app HTTP mode directly
                 post("/owntracks") {
-                    handleOwnTracksUpdate(call)
-                }
-                // Common pattern used by OwnTracks: /owntracks/{user}/{device}
-                post("/owntracks/{user}/{device}") {
                     handleOwnTracksUpdate(call)
                 }
             }
         }.start(wait = false)
     }
 
-    private suspend fun handleLocationUpdate(call: ApplicationCall) {
-        val bodyString = call.receiveText()
-        runCatching {
-            val body = Json.decodeFromString<LocationRequest>(bodyString)
-
-            KSLog.info("Processing location update: $body")
-
-            // Check for accuracy
-            if (body.acc > MAX_ACCURACY_THRESHOLD) {
-                KSLog.info("Location update rejected due to low accuracy: ${body.acc}m (threshold: ${MAX_ACCURACY_THRESHOLD}m)")
-                call.respond(
-                    HttpStatusCode.BadRequest,
-                    "Location accuracy (${body.acc}m) is below the required threshold (${MAX_ACCURACY_THRESHOLD}m)."
-                )
-                return
-            }
-
-            databaseService.save(
-                Instant.ofEpochSecond(body.timestamp)
-                    .atZone(body.timezone.toTimeZone())
-                    .toLocalDateTime(),
-                body.latitude,
-                body.longitude,
-                body.timezone.toTimeZone(),
-                body.country.toCountry(),
-                body.alt,
-                body.batt,
-                body.acc,
-                body.vac,
-                body.conn,
-                body.locality,
-                body.ghash,
-                body.p,
-                body.addr,
-                body.bssid,
-                body.ssid,
-                body.bs
-            )
-        }.onSuccess {
-            KSLog.info("Successfully saved location update")
-            call.respond(HttpStatusCode.OK)
-        }.onFailure { error ->
-            KSLog.info("Failed to save location update: ${error.message}. Body: $bodyString")
-            call.respond(
-                HttpStatusCode.InternalServerError,
-                "Failed to save location data: ${error.message}"
-            )
-        }
-    }
 
     private suspend fun handleOwnTracksUpdate(call: ApplicationCall) {
         val bodyString = call.receiveText()
+        KSLog.info("OwnTracks raw body: $bodyString")
         runCatching {
             val body = jsonRelaxed.decodeFromString<OwnTracksLocation>(bodyString)
 
