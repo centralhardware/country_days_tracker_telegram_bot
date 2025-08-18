@@ -30,8 +30,7 @@ class DatabaseService {
         p: Double,
         addr: String,
         bssid: String?,
-        ssid: String?,
-        bs: Int?
+        ssid: String?
     ) {
         sessionOf(dataSource).use { session ->
             session.execute(
@@ -54,8 +53,7 @@ class DatabaseService {
                             p,
                             addr,
                             bssid,
-                            ssid,
-                            bs
+                            ssid
                         )
                         SELECT
                             toDateTime(?) AS date_time,
@@ -73,8 +71,7 @@ class DatabaseService {
                             toFloat64(?) AS p,
                             toString(?) AS addr,
                             toString(?) AS bssid,
-                            toString(?) AS ssid,
-                            toUInt32(?) AS bs
+                            toString(?) AS ssid
                     """.trimIndent(),
                     dateTime,
                     latitude,
@@ -91,8 +88,7 @@ class DatabaseService {
                     p,
                     addr,
                     bssid,
-                    ssid,
-                    bs
+                    ssid
                 )
 
             )

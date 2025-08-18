@@ -93,8 +93,7 @@ class WebService(private val databaseService: DatabaseService) {
                     body.p,
                     body.addr,
                     body.bssid,
-                    body.ssid,
-                    body.bs
+                    body.ssid
                 )
         }.onSuccess {
             KSLog.info("Successfully saved location update")
