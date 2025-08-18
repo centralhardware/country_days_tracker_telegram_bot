@@ -7,9 +7,19 @@ import java.time.ZoneId
 import java.util.Properties
 import javax.sql.DataSource
 
+import org.flywaydb.core.Flyway
+
 class DatabaseService {
     val dataSource: DataSource = try {
-        DataSourceImpl(System.getenv("CLICKHOUSE_URL"), Properties())
+        val url = System.getenv("CLICKHOUSE_URL")
+        // Run migrations before creating sessions
+        Flyway.configure()
+            .dataSource(url, "", "")
+            .locations("classpath:db/migration")
+            .baselineOnMigrate(true)
+            .load()
+            .migrate()
+        DataSourceImpl(url, Properties())
     } catch (e: SQLException) {
         throw RuntimeException(e)
     }
