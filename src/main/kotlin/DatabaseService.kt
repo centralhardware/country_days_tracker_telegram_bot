@@ -22,7 +22,8 @@ class DatabaseService {
         // Run migrations using the same DataSource
         Flyway.configure()
             .dataSource(ds)
-            .locations("classpath:db/migration")
+            // Try both classpath and the Jib resources path inside the container
+            .locations("classpath:db/migration", "filesystem:/app/resources/db/migration")
             .baselineOnMigrate(true)
             .load()
             .migrate()
