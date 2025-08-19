@@ -29,8 +29,8 @@ dependencies {
     implementation("io.ktor:ktor-server-content-negotiation:$ktorVersion")
     implementation("io.ktor:ktor-serialization-kotlinx-json:${ktorVersion}")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
-    implementation("org.flywaydb:flyway-core:10.17.0")
-    implementation("org.flywaydb:flyway-database-clickhouse:10.17.0")
+    implementation("org.flywaydb:flyway-core:11.4.0")
+    implementation("org.flywaydb:flyway-database-clickhouse:10.24.0")
 }
 
 tasks.test {
