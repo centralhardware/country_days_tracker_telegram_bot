@@ -6,12 +6,9 @@ import dev.inmo.tgbotapi.AppConfig
 import dev.inmo.tgbotapi.extensions.api.bot.setMyCommands
 import dev.inmo.tgbotapi.extensions.api.send.reply
 import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onCommand
-import dev.inmo.tgbotapi.extensions.utils.extensions.raw.from
 import dev.inmo.tgbotapi.longPolling
 import dev.inmo.tgbotapi.types.BotCommand
 import dev.inmo.tgbotapi.utils.RiskFeature
-import me.centralhardware.telegram.ktgbotapi.access.checker.EnvironmentVariableUserAccessChecker
-import me.centralhardware.telegram.ktgbotapi.access.middleware.restrictAccess
 import java.util.concurrent.atomic.AtomicInteger
 
 private val dbService = DatabaseService()
