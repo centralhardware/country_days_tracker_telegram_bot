@@ -158,6 +158,24 @@ class DatabaseService {
             )
     }
 
+    fun getLastLocation(): Triple<Float, Float, String>? {
+        return sessionOf(dataSource)
+            .run(
+                queryOf(
+                    // language=SQL
+                    """
+                        SELECT latitude, longitude, country
+                        FROM country_days_tracker_bot.country_days_tracker
+                        ORDER BY date_time DESC
+                        LIMIT 1
+                    """.trimIndent(),
+                    mapOf()
+                ).map { row ->
+                    Triple(row.float("latitude"), row.float("longitude"), row.string("country"))
+                }.asSingle
+            )
+    }
+
     fun getCurrentCountryLength(): Pair<String, Int> {
         return sessionOf(dataSource)
             .run(

@@ -23,9 +23,9 @@ suspend fun main() {
     webService.start(80)
     longPolling({ restrictAccess(EnvironmentVariableUserAccessChecker()) }) {
 
-        liveLocationService.updateLiveLocationCallback = { userId, messageId, latitude, longitude, caption ->
+        liveLocationService.updateLiveLocationCallback = { chatId, messageId, latitude, longitude, caption ->
             editLiveLocation(
-                chatId = userId,
+                chatId = chatId,
                 messageId = messageId,
                 latitude = latitude.toDouble(),
                 longitude = longitude.toDouble()
@@ -74,23 +74,29 @@ suspend fun main() {
             }
 
             onCommand("subscribe") {
-                val demoUserId = dev.inmo.tgbotapi.types.UserId(dev.inmo.tgbotapi.types.RawChatId(123456789))
+                // Используем chat ID из команды
+                val chatId = it.chat.id
+
+                // Получаем последние координаты из базы
+                val lastLocation = dbService.getLastLocation()
+                val lat = lastLocation?.first?.toDouble() ?: 0.0
+                val lon = lastLocation?.second?.toDouble() ?: 0.0
 
                 val message = sendLocation(
-                    chatId = demoUserId,
-                    latitude = 0.0,
-                    longitude = 0.0,
+                    chatId = chatId,
+                    latitude = lat,
+                    longitude = lon,
                     livePeriod = 86400 // 24 часа
                 )
 
-                liveLocationService.subscribeToLocationUpdates(demoUserId, message.messageId)
+                liveLocationService.subscribeToLocationUpdates(chatId, message.messageId)
 
-                reply(it, "📍 Subscribed! Live location map created. It will update automatically when new locations arrive.")
+                reply(it, "📍 Subscribed! Live location map created at last known position. It will update automatically when new locations arrive.")
             }
 
             onCommand("unsubscribe") {
-                val demoUserId = dev.inmo.tgbotapi.types.UserId(dev.inmo.tgbotapi.types.RawChatId(123456789))
-                liveLocationService.unsubscribeFromLocationUpdates(demoUserId)
+                val chatId = it.chat.id
+                liveLocationService.unsubscribeFromLocationUpdates(chatId)
                 reply(it, "🔕 Unsubscribed from location updates.")
             }
         }
