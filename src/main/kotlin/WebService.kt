@@ -36,7 +36,7 @@ data class LocationRequest(
     val bs: Int? = null
 )
 
-class WebService(private val databaseService: DatabaseService) {
+class WebService(private val databaseService: DatabaseService, private val liveLocationService: LiveLocationService) {
 
     companion object {
         private const val MAX_ACCURACY_THRESHOLD = 255
@@ -94,6 +94,13 @@ class WebService(private val databaseService: DatabaseService) {
                     body.addr,
                     body.bssid,
                     body.ssid
+                )
+
+                liveLocationService.notifyLocationUpdate(
+                    body.latitude,
+                    body.longitude,
+                    body.country.toCountry(),
+                    body.locality
                 )
         }.onSuccess {
             KSLog.info("Successfully saved location update")

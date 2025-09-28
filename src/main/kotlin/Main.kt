@@ -5,6 +5,8 @@ import dev.inmo.micro_utils.common.Warning
 import dev.inmo.tgbotapi.AppConfig
 import dev.inmo.tgbotapi.extensions.api.bot.setMyCommands
 import dev.inmo.tgbotapi.extensions.api.send.reply
+import dev.inmo.tgbotapi.extensions.api.send.sendLocation
+import dev.inmo.tgbotapi.extensions.api.edit.location.live.editLiveLocation
 import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onCommand
 import dev.inmo.tgbotapi.longPolling
 import dev.inmo.tgbotapi.types.BotCommand
@@ -12,16 +14,29 @@ import dev.inmo.tgbotapi.utils.RiskFeature
 import java.util.concurrent.atomic.AtomicInteger
 
 private val dbService = DatabaseService()
-private val webService = WebService(dbService)
+private val liveLocationService = LiveLocationService()
+private val webService = WebService(dbService, liveLocationService)
 
 @OptIn(Warning::class, RiskFeature::class)
 suspend fun main() {
     AppConfig.init("CountryDaysTrackerBot")
     webService.start(80)
     longPolling({ restrictAccess(EnvironmentVariableUserAccessChecker()) }) {
-            setMyCommands(
+
+        liveLocationService.updateLiveLocationCallback = { userId, messageId, latitude, longitude, caption ->
+            editLiveLocation(
+                chatId = userId,
+                messageId = messageId,
+                latitude = latitude.toDouble(),
+                longitude = longitude.toDouble()
+            )
+        }
+
+        setMyCommands(
                 BotCommand("stat", "show statistics"),
-                BotCommand("citystat", "show city statistics")
+                BotCommand("citystat", "show city statistics"),
+                BotCommand("subscribe", "subscribe to location updates"),
+                BotCommand("unsubscribe", "unsubscribe from location updates")
             )
             onCommand("stat") {
                 val i = AtomicInteger(1)
@@ -57,11 +72,31 @@ suspend fun main() {
                 KSLog.info(stat)
                 reply(it, msg)
             }
+
+            onCommand("subscribe") {
+                val demoUserId = dev.inmo.tgbotapi.types.UserId(dev.inmo.tgbotapi.types.RawChatId(123456789))
+
+                val message = sendLocation(
+                    chatId = demoUserId,
+                    latitude = 0.0,
+                    longitude = 0.0,
+                    livePeriod = 86400 // 24 часа
+                )
+
+                liveLocationService.subscribeToLocationUpdates(demoUserId, message.messageId)
+
+                reply(it, "📍 Subscribed! Live location map created. It will update automatically when new locations arrive.")
+            }
+
+            onCommand("unsubscribe") {
+                val demoUserId = dev.inmo.tgbotapi.types.UserId(dev.inmo.tgbotapi.types.RawChatId(123456789))
+                liveLocationService.unsubscribeFromLocationUpdates(demoUserId)
+                reply(it, "🔕 Unsubscribed from location updates.")
+            }
         }
         .second
         .join()
 }
-
 
 const val TOTAL_COUNTRIES = 193
 fun calculateVisitedPercentage(visitedCountries: Int): String {

@@ -13,16 +13,12 @@ class DatabaseService {
     val dataSource: DataSource = try {
         val url = System.getenv("CLICKHOUSE_URL")
         val props = Properties().apply {
-            // Allow credentials via environment variables in addition to URL query params
             System.getenv("CLICKHOUSE_USER")?.let { put("user", it) }
             System.getenv("CLICKHOUSE_PASSWORD")?.let { put("password", it) }
         }
-        // Prepare DataSource first to ensure ClickHouse driver handles params
         val ds = DataSourceImpl(url, props)
-        // Run migrations using the same DataSource
         Flyway.configure()
             .dataSource(ds)
-            // Try both classpath and the Jib resources path inside the container
             .locations("classpath:db/migration", "filesystem:/app/resources/db/migration")
             .baselineOnMigrate(true)
             .load()
