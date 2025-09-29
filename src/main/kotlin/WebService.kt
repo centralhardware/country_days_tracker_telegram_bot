@@ -1,5 +1,7 @@
 import dev.inmo.kslog.common.KSLog
 import dev.inmo.kslog.common.info
+import dev.inmo.tgbotapi.types.IdChatIdentifier
+import dev.inmo.tgbotapi.types.MessageId
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
@@ -9,6 +11,8 @@ import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import java.time.ZoneId
@@ -36,11 +40,20 @@ data class LocationRequest(
     val bs: Int? = null
 )
 
-class WebService(private val databaseService: DatabaseService, private val liveLocationService: LiveLocationService) {
+@Serializable
+data class LocationUpdate(
+    val latitude: Float,
+    val longitude: Float
+)
+
+class WebService(private val databaseService: DatabaseService) {
 
     companion object {
         private const val MAX_ACCURACY_THRESHOLD = 255
     }
+
+    private val _locationUpdates = MutableSharedFlow<LocationUpdate>()
+    val locationUpdates = _locationUpdates.asSharedFlow()
 
     fun start(port: Int = 80): EmbeddedServer<NettyApplicationEngine, NettyApplicationEngine.Configuration> {
         KSLog.info("Starting web service on port $port")
@@ -96,12 +109,7 @@ class WebService(private val databaseService: DatabaseService, private val liveL
                     body.ssid
                 )
 
-                liveLocationService.notifyLocationUpdate(
-                    body.latitude,
-                    body.longitude,
-                    body.country.toCountry(),
-                    body.locality
-                )
+                _locationUpdates.emit(LocationUpdate(body.latitude, body.longitude))
         }.onSuccess {
             KSLog.info("Successfully saved location update")
             call.respond(HttpStatusCode.OK)

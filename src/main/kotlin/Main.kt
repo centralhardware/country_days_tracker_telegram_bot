@@ -10,33 +10,56 @@ import dev.inmo.tgbotapi.extensions.api.edit.location.live.editLiveLocation
 import dev.inmo.tgbotapi.extensions.behaviour_builder.triggers_handling.onCommand
 import dev.inmo.tgbotapi.longPolling
 import dev.inmo.tgbotapi.types.BotCommand
+import dev.inmo.tgbotapi.types.IdChatIdentifier
+import dev.inmo.tgbotapi.types.MessageId
 import dev.inmo.tgbotapi.utils.RiskFeature
 import java.util.concurrent.atomic.AtomicInteger
+import java.util.concurrent.ConcurrentHashMap
+import kotlinx.coroutines.*
+import java.time.Duration
+import java.time.Instant
 
 private val dbService = DatabaseService()
-private val liveLocationService = LiveLocationService()
-private val webService = WebService(dbService, liveLocationService)
+private val webService = WebService(dbService)
+private val activeSubscriptions = ConcurrentHashMap<IdChatIdentifier, Pair<MessageId, Instant>>()
 
 @OptIn(Warning::class, RiskFeature::class)
 suspend fun main() {
     AppConfig.init("CountryDaysTrackerBot")
     webService.start(80)
+
     longPolling({ restrictAccess(EnvironmentVariableUserAccessChecker()) }) {
 
-        liveLocationService.updateLiveLocationCallback = { chatId, messageId, latitude, longitude, caption ->
-            editLiveLocation(
-                chatId = chatId,
-                messageId = messageId,
-                latitude = latitude.toDouble(),
-                longitude = longitude.toDouble()
-            )
+        launch {
+            webService.locationUpdates.collect { update ->
+                val now = Instant.now()
+                activeSubscriptions.entries.removeIf { (_, pair) ->
+                    val (_, startTime) = pair
+                    val duration = Duration.between(startTime, now)
+                    duration.toMinutes() >= 30
+                }
+
+                activeSubscriptions.forEach { (chatId, pair) ->
+                    val (messageId, _) = pair
+                    try {
+                        editLiveLocation(
+                            chatId = chatId,
+                            messageId = messageId,
+                            latitude = update.latitude.toDouble(),
+                            longitude = update.longitude.toDouble()
+                        )
+                        KSLog.info("Updated location for chat $chatId to ${update.latitude}, ${update.longitude}")
+                    } catch (e: Exception) {
+                        KSLog.info("Failed to update location for chat $chatId: ${e.message}")
+                    }
+                }
+            }
         }
 
         setMyCommands(
                 BotCommand("stat", "show statistics"),
                 BotCommand("citystat", "show city statistics"),
-                BotCommand("subscribe", "subscribe to location updates"),
-                BotCommand("unsubscribe", "unsubscribe from location updates")
+                BotCommand("subscribe", "subscribe to location updates")
             )
             onCommand("stat") {
                 val i = AtomicInteger(1)
@@ -74,10 +97,8 @@ suspend fun main() {
             }
 
             onCommand("subscribe") {
-                // Используем chat ID из команды
                 val chatId = it.chat.id
 
-                // Получаем последние координаты из базы
                 val lastLocation = dbService.getLastLocation()
                 val lat = lastLocation?.first?.toDouble() ?: 0.0
                 val lon = lastLocation?.second?.toDouble() ?: 0.0
@@ -86,18 +107,12 @@ suspend fun main() {
                     chatId = chatId,
                     latitude = lat,
                     longitude = lon,
-                    livePeriod = 86400 // 24 часа
+                    livePeriod = 1800
                 )
 
-                liveLocationService.subscribeToLocationUpdates(chatId, message.messageId)
+                activeSubscriptions[chatId] = Pair(message.messageId, Instant.now())
 
-                reply(it, "📍 Subscribed! Live location map created at last known position. It will update automatically when new locations arrive.")
-            }
-
-            onCommand("unsubscribe") {
-                val chatId = it.chat.id
-                liveLocationService.unsubscribeFromLocationUpdates(chatId)
-                reply(it, "🔕 Unsubscribed from location updates.")
+                reply(it, "📍 Subscribed! Live location will update automatically when new coordinates arrive.")
             }
         }
         .second
