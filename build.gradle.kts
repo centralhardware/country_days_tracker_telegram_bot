@@ -18,7 +18,11 @@ val clickhouseVersion = "0.9.2"
 
 dependencies {
     implementation("dev.inmo:tgbotapi:$ktgbotapiVersion")
-    implementation("com.github.centralhardware:ktgbotapi-commons:$ktgbotapiVersion")
+    implementation("com.github.centralhardware:ktgbotapi-commons:$ktgbotapiVersion") {
+        exclude(group = "com.github.centralhardware", module = "ktgbotapi-middlewars:ktgbotapi-clickhouse-logging-middleware")
+    }
+    implementation("com.github.centralhardware:ktgbotapi-middlewars:$ktgbotapiVersion")
+    implementation("com.github.centralhardware.ktgbotapi-middlewars:ktgbotapi-clickhouse-logging-middleware:${ktgbotapiVersion}-2")
     implementation("com.github.centralhardware.ktgbotapi-middlewars:ktgbotapi-restrict-access-middleware:$ktgbotapiVersion")
     implementation("com.clickhouse:clickhouse-jdbc:$clickhouseVersion")
     implementation("com.clickhouse:clickhouse-http-client:$clickhouseVersion")
